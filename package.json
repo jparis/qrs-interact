@@ -1,0 +1,27 @@
+{
+  "name": "qrs-interact",
+  "version": "0.0.1",
+  "description": "A small javascript library to interact with the Qlik Sense Repository Service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eapowertools/qrs-interact.git"
+  },
+  "author": "EA Power Tools",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eapowertools/qrs-interact/issues"
+  },
+  "homepage": "https://github.com/eapowertools/qrs-interact#readme",
+  "dependencies": {
+    "bluebird": "^3.4.1",
+    "extend": "^3.0.0",
+    "fs": "0.0.2",
+    "path": "^0.12.7",
+    "request": "^2.72.0",
+    "winston": "^2.2.0"
+  }
+}
