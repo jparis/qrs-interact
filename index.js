@@ -21,7 +21,7 @@ var qrsInteract = function QRSInteract(hostname){
         json: true
     });
 
-   function Get(path) {
+   this.Get = function(path) {
         return new Promise(function(resolve, reject) {
             var sCode;
             var r = qrsInteract.defaults;
@@ -48,7 +48,7 @@ var qrsInteract = function QRSInteract(hostname){
         });
     };
 
-    function Post(path, body, sendType) {
+    this.Post = function(path, body, sendType) {
         return new Promise(function(resolve, reject) {
             var sCode;
             var r = qrsInteract.defaults;
@@ -78,7 +78,7 @@ var qrsInteract = function QRSInteract(hostname){
         });
     };
 
-    function Put(path, body) {
+    this.Put = function(path, body) {
         return new Promise(function(resolve, reject) {
             var sCode;
             var r = qrsInteract.defaults;
@@ -101,7 +101,7 @@ var qrsInteract = function QRSInteract(hostname){
         })
     };
 
-    function Delete(path) {
+    this.Delete = function(path) {
         return new Promise(function(resolve, reject) {
 
             var sCode;
