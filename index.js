@@ -39,9 +39,7 @@ var qrsInteract = function qrsInteract(hostname){
                     }
                 })
                 .on('error', function(error) {
-                    logger.error('get::Error in request module', {
-                        module: 'qrsinteractions'
-                    });
+
                 })
                 .on('end', function() {
                     resolve(JSON.parse(res));
@@ -52,7 +50,6 @@ var qrsInteract = function qrsInteract(hostname){
 
     function Post(path, body, sendType) {
         return new Promise(function(resolve, reject) {
-            //logger.debug('post::running QRSInteract.post', {module: 'qrsinteraction'});
             var sCode;
             var r = qrsInteract.defaults;
             var res = '';
@@ -66,20 +63,12 @@ var qrsInteract = function qrsInteract(hostname){
                     sCode = response.statusCode;
                 })
                 .on('error', function(err) {
-                    logger.error('post::Error at qrsinteractions during post::' + err, {
-                        module: 'qrsinteraction'
-                    });
+
                 })
                 .on('data', function(data) {
                     if (sCode == 200 || sCode == 201) {
-                        logger.debug('data is of type: ' + typeof data, {
-                            module: 'qrsinteractions'
-                        });
                         res += data;
                     } else {
-                        logger.error('post::Error at qrsinteractions during post::' + sCode + '::' + data, {
-                            module: 'qrsinteraction'
-                        });
                         reject("Received error code: " + sCode + '::' + data);
                     }
                 })
@@ -101,19 +90,12 @@ var qrsInteract = function qrsInteract(hostname){
                 .on('response', function(response, body) {
                     sCode = response.statusCode;
                     if (sCode == 204) {
-
                         resolve(sCode);
                     } else {
-                        logger.error('put::returned status code ' + sCode, {
-                            module: 'qrsinteraction'
-                        });
                         reject(sCode)
                     }
                 })
                 .on('error', function(err) {
-                    logger.error('put::Error at qrsinteractions during put::' + err, {
-                        module: 'qrsinteraction'
-                    });
 
                 });
         })
@@ -135,17 +117,11 @@ var qrsInteract = function qrsInteract(hostname){
                     if (sCode == 204) {
                         resolve(sCode);
                     } else {
-                        logger.error('delete::Error at qrsinteractions during delete::' + sCode, {
-                            module: 'qrsinteraction'
-                        });
                         reject("Received error code: " + sCode);
                     }
                 })
                 .on('error', function(error) {
 
-                    logger.error(error, {
-                        module: 'qrsinteraction'
-                    });
                 });
         });
     };
