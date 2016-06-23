@@ -4,7 +4,7 @@ var fs = require('fs');
 var Promise = require('bluebird');
 var winston = require('winston');
 
-var qrsInteract = function qrsInteract(hostname){
+var qrsInteract = function QRSInteract(hostname){
     var defaults = request.defaults({
         rejectUnauthorized: false,
         host: hostname,
