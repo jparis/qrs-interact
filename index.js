@@ -4,9 +4,9 @@ var fs = require('fs');
 var Promise = require('bluebird');
 var winston = require('winston');
 
-var qrsInteract = function QRSInteract(hostname){
+var qrsInteract = function QRSInteract(hostname) {
     var defaultPort = 4242;
-    var basePath = "https://"+hostname+":"+defaultPort+"/qrs";
+    var basePath = "https://" + hostname + ":" + defaultPort + "/qrs";
     var xrfkey = "xrfkey=ABCDEFG123456789";
     var defaults = request.defaults({
         rejectUnauthorized: false,
@@ -25,7 +25,7 @@ var qrsInteract = function QRSInteract(hostname){
     });
 
     if (!String.prototype.startsWith) {
-        String.prototype.startsWith = function(searchString, position){
+        String.prototype.startsWith = function(searchString, position) {
             position = position || 0;
             return this.substr(position, searchString.length) === searchString;
         };
@@ -43,33 +43,28 @@ var qrsInteract = function QRSInteract(hostname){
         };
     }
 
-    getFullPath = function(path) {
+    var getFullPath = function(path) {
         var newPath = basePath;
-        if (!path.startsWith('/'))
-        {
-            newPath += '/'; 
+        if (!path.startsWith('/')) {
+            newPath += '/';
         }
         newPath += path;
-        if (newPath.endsWith('/'))
-        {
-            newPath = newPath.substr(0, newPath.length-1);
+        if (newPath.endsWith('/')) {
+            newPath = newPath.substr(0, newPath.length - 1);
         }
 
         var indexOfSlash = newPath.lastIndexOf('/');
         var indexOfQuery = newPath.lastIndexOf('?');
-        if (indexOfQuery <= indexOfSlash)
-        {
+        if (indexOfQuery <= indexOfSlash) {
             newPath += '?' + xrfkey;
-        }
-        else
-        {
+        } else {
             newPath += '&' + xrfkey;
         }
 
         return newPath;
     }
 
-   this.Get = function(path) {
+    this.Get = function(path) {
         return new Promise(function(resolve, reject) {
             path = getFullPath(path);
             var sCode;
