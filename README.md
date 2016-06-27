@@ -9,10 +9,13 @@ QRS Interact is a simple javascript library that allows users to send queries to
 
 ####   Usage
 To use the qrs-interact module, first you must create a new instance.
-```var <variableName> = new qrsInteract(<someHostname>);```
+```
+var <variableName> = new qrsInteract(<someHostname>);
+```
 
 Once you have initialized an instance, GET, POST, PUT, and DELETE all return promises. They can be used as follows.
-```<instanceName>.Get(<somePath>)
+```
+<instanceName>.Get(<somePath>)
     .then(function(result)
     {
         // do some work
@@ -21,7 +24,7 @@ Once you have initialized an instance, GET, POST, PUT, and DELETE all return pro
     {
         // catch the error
     });
-    ```
+```
 
 #####   Example
 ```
