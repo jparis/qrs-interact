@@ -5,6 +5,9 @@ var Promise = require('bluebird');
 var winston = require('winston');
 
 var qrsInteract = function QRSInteract(hostname){
+    var defaultPort = 4242;
+    var basePath = "https://"+hostname+":"+defaultPort+"/qrs";
+    var xrfkey = "xrfkey=ABCDEFG123456789";
     var defaults = request.defaults({
         rejectUnauthorized: false,
         host: hostname,
@@ -21,8 +24,35 @@ var qrsInteract = function QRSInteract(hostname){
         json: true
     });
 
+    this.getFullPath = function(path) {
+        var newPath = basePath;
+        if (!path.startsWith('/'))
+        {
+            newPath += '/'; 
+        }
+        newPath += path;
+        if (newPath.endsWith('/'))
+        {
+            newPath = newPath.substr(0, newPath.length-1);
+        }
+
+        var indexOfSlash = newPath.lastIndexOf('/');
+        var indexOfQuery = newPath.lastIndexOf('?');
+        if (indexOfQuery <= indexOfSlash)
+        {
+            newPath += '?' + xrfkey;
+        }
+        else
+        {
+            newPath += '&' + xrfkey;
+        }
+
+        return path;
+    }
+
    this.Get = function(path) {
         return new Promise(function(resolve, reject) {
+            path = getFullPath(path);
             var sCode;
             var r = defaults;
             var res = '';
@@ -50,6 +80,7 @@ var qrsInteract = function QRSInteract(hostname){
 
     this.Post = function(path, body, sendType) {
         return new Promise(function(resolve, reject) {
+            path = getFullPath(path);
             var sCode;
             var r = defaults;
             var res = '';
@@ -80,6 +111,7 @@ var qrsInteract = function QRSInteract(hostname){
 
     this.Put = function(path, body) {
         return new Promise(function(resolve, reject) {
+            path = getFullPath(path);
             var sCode;
             var r = defaults;
             r({
@@ -103,7 +135,7 @@ var qrsInteract = function QRSInteract(hostname){
 
     this.Delete = function(path) {
         return new Promise(function(resolve, reject) {
-
+            path = getFullPath(path);
             var sCode;
             var r = defaults;
 
