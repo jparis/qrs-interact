@@ -227,9 +227,9 @@ var qrsInteract = function QRSInteract(inputConfig) {
         });
     };
 
-    this.GetHostname = function()
+    this.GetBasePath = function()
     {
-        return localConfig.hostname;
+        return "https://" + localConfig.hostname + ":" + defaultPort + "/qrs";
     }
 };
 
