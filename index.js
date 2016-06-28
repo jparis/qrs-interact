@@ -4,19 +4,38 @@ var fs = require('fs');
 var Promise = require('bluebird');
 var winston = require('winston');
 
-var qrsInteract = function QRSInteract(hostname) {
+var qrsInteract = function QRSInteract(inputConfig) {
+    var generateXrfKey = function() {
+        var xrfString = "";
+        for (i = 0; i < 16; i++) {
+            if (Math.floor(Math.random() * 2) == 0) {
+                xrfString += Math.floor(Math.random() * 10).toString();
+            } else {
+                var charNumber = Math.floor(Math.random() * 26);
+                if (Math.floor(Math.random() * 2) == 0) {
+                    //small letter
+                    xrfString += String.fromCharCode(charNumber + 97);
+                } else {
+                    xrfString += String.fromCharCode(charNumber + 65);
+                }
+            }
+        }
+        return xrfString;
+    }
+
     var defaultPort = 4242;
-    var basePath = "https://" + hostname + ":" + defaultPort + "/qrs";
-    var xrfkey = "xrfkey=ABCDEFG123456789";
+    var basePath = "https://" + inputConfig + ":" + defaultPort + "/qrs";
+    var xrfkey = generateXrfKey();
+    var xrfkeyParam = "xrfkey="+xrfkey;
     var defaults = request.defaults({
         rejectUnauthorized: false,
-        host: hostname,
+        host: inputConfig,
         cert: fs.readFileSync(config.certificates.client),
         key: fs.readFileSync(config.certificates.client_key),
         ca: fs.readFileSync(config.certificates.root),
         headers: {
             'X-Qlik-User': config.repoAccount,
-            'X-Qlik-Xrfkey': 'ABCDEFG123456789',
+            'X-Qlik-Xrfkey': xrfkey,
             'Content-Type': 'application/json',
             'Accept-Encoding': 'gzip'
         },
@@ -43,6 +62,23 @@ var qrsInteract = function QRSInteract(hostname) {
         };
     }
 
+    var generateXrfKey = function() {
+        var xrfString = "";
+        for (i = 0; i < 16; i++) {
+            if (Math.floor(Math.random() * 2) == 0) {
+                xrfString += Math.floor(Math.random() * 10).toString();
+            } else {
+                var charNumber = Math.floor(Math.random() * 26);
+                if (Math.floor(Math.random() * 2) == 0) {
+                    //small letter
+                    xrfString += String.fromCharCode(charNumber + 97);
+                } else {
+                    xrfString += String.fromCharCode(charNumber + 65);
+                }
+            }
+        }
+    }
+
     var getFullPath = function(path) {
         var newPath = basePath;
         if (!path.startsWith('/')) {
@@ -56,9 +92,9 @@ var qrsInteract = function QRSInteract(hostname) {
         var indexOfSlash = newPath.lastIndexOf('/');
         var indexOfQuery = newPath.lastIndexOf('?');
         if (indexOfQuery <= indexOfSlash) {
-            newPath += '?' + xrfkey;
+            newPath += '?' + xrfkeyParam;
         } else {
-            newPath += '&' + xrfkey;
+            newPath += '&' + xrfkeyParam;
         }
 
         return newPath;
