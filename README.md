@@ -1,4 +1,5 @@
-# qrs-interact
+# [![NPM](https://nodei.co/npm/qrs-interact.png)](https://nodei.co/npm/qrs-interact/)
+##qrs-interact
 QRS Interact is a simple javascript library that allows users to send queries to the Qlik Sense Repository Service.
 
 ###Getting Started
