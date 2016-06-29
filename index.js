@@ -1,8 +1,10 @@
 var config = require('./config/config');
+var common = require('./common');
 var request = require('request');
 var fs = require('fs');
 var Promise = require('bluebird');
 var winston = require('winston');
+var extend = require('extend');
 
 var qrsInteract = function QRSInteract(inputConfig) {
     var generateXrfKey = function() {
@@ -23,18 +25,35 @@ var qrsInteract = function QRSInteract(inputConfig) {
         return xrfString;
     }
 
-    var defaultPort = 4242;
-    var basePath = "https://" + inputConfig + ":" + defaultPort + "/qrs";
+    var updateConfig = function(inputConfig)
+    {
+        var newConfig = common.clone(config);
+        if (typeof inputConfig == 'string')
+        {
+            newConfig.hostname = inputConfig;
+        }
+        else
+        {
+            newConfig = extend(true, newConfig, inputConfig);
+        }
+        return newConfig;
+    }
+
+    var localConfig = updateConfig(inputConfig);
+
+
+    var defaultPort = localConfig.portNumber;
+    var basePath = "https://" + localConfig.hostname + ":" + defaultPort + "/qrs";
     var xrfkey = generateXrfKey();
     var xrfkeyParam = "xrfkey="+xrfkey;
     var defaults = request.defaults({
         rejectUnauthorized: false,
-        host: inputConfig,
-        cert: fs.readFileSync(config.certificates.client),
-        key: fs.readFileSync(config.certificates.client_key),
-        ca: fs.readFileSync(config.certificates.root),
+        host: localConfig.hostname,
+        cert: fs.readFileSync(localConfig.certificates.client),
+        key: fs.readFileSync(localConfig.certificates.client_key),
+        ca: fs.readFileSync(localConfig.certificates.root),
         headers: {
-            'X-Qlik-User': config.repoAccount,
+            'X-Qlik-User': localConfig.repoAccount,
             'X-Qlik-Xrfkey': xrfkey,
             'Content-Type': 'application/json',
             'Accept-Encoding': 'gzip'
@@ -207,6 +226,11 @@ var qrsInteract = function QRSInteract(inputConfig) {
                 });
         });
     };
+
+    this.GetBasePath = function()
+    {
+        return "https://" + localConfig.hostname + ":" + defaultPort + "/qrs";
+    }
 };
 
 module.exports = qrsInteract;
