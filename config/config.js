@@ -6,6 +6,8 @@ var routePath = path.join(__dirname, 'server/routes/');
 var publicPath = path.join(__dirname, 'public/');
 
 var config = extend(true, {
+	hostname: '',
+	portNumber: 4242,
 	repoAccount: 'UserDirectory=Internal;UserId=sa_repository',
 	repoAccountUserDirectory: 'INTERNAL',
 	repoAccountUserId: 'sa_repository',
