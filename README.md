@@ -4,6 +4,8 @@ QRS Interact is a simple javascript library that allows users to send queries to
 
 ###Getting Started
 
+For more information and advanced usage, please reference the [wiki](https://github.com/eapowertools/qrs-interact/wiki).
+
 ####   Installing
 ```npm install qrs-interact```
 
