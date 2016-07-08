@@ -5,6 +5,7 @@ var fs = require('fs');
 var Promise = require('bluebird');
 var winston = require('winston');
 var extend = require('extend');
+var path = require('path');
 
 var qrsInteract = function QRSInteract(inputConfig) {
     var generateXrfKey = function() {
@@ -36,6 +37,17 @@ var qrsInteract = function QRSInteract(inputConfig) {
         {
             newConfig = extend(true, newConfig, inputConfig);
         }
+        
+        newConfig = extend(true, newConfig, {
+            certificates: {
+		        client: path.resolve(newConfig.localCertPath, 'client.pem'),
+		        client_key: path.resolve(newConfig.localCertPath, 'client_key.pem'),
+		        server: path.resolve(newConfig.localCertPath, 'server.pem'),
+		        server_key: path.resolve(newConfig.localCertPath, 'server_key.pem'),
+		        root: path.resolve(newConfig.localCertPath, 'root.pem')
+            }
+        });
+
         return newConfig;
     }
 
