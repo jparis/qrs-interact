@@ -1,10 +1,4 @@
-var config = require('./config/config');
-var common = require('./common');
-var fs = require('fs');
 var Promise = require('bluebird');
-var winston = require('winston');
-var extend = require('extend');
-var path = require('path');
 
 var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefaults) {
 

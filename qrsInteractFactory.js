@@ -1,4 +1,9 @@
-var qrsInteract = require('./qrsInteract');
+var common = require('./common');
+var config = require('./config/config');
+var extend = require('extend');
+var fs = require('fs');
+var path = require('path');
+var qrsInteractMain = require('./qrsInteract');
 var request = require('request');
 
 var qrsInteract = function QRSInteract(inputConfig) {
@@ -68,7 +73,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
     });
 
 
-    var qrsInteractInstance = QRSInteractMain(basePath, xrfkeyParam, defaults);
+    var qrsInteractInstance = new qrsInteractMain(basePath, xrfkeyParam, defaults);
 
     return qrsInteractInstance;
 }
