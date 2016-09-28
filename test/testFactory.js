@@ -2,6 +2,9 @@ var nock = require('nock');
 var qrsInteractMain = require('../qrsInteract');
 var request = require('request');
 
+
+// test setup
+
 var generateXrfKey = function() {
     var xrfString = "";
     for (i = 0; i < 16; i++) {
@@ -25,6 +28,10 @@ var xrfkeyParam = "xrfkey="+xrfkey;
 
 var qrsInteractInstance = new qrsInteractMain("http://test.factory", xrfkeyParam, request);
 
+
+
+// test case 1
+
 var scope = nock('http://test.factory')
     .get('/about' + '?' + xrfkeyParam)
     .reply(200, {info: "about endpoint valid"});
@@ -32,3 +39,5 @@ var scope = nock('http://test.factory')
 qrsInteractInstance.Get('about').then(function(result){
     console.log(result)
 });
+
+// test case 2
