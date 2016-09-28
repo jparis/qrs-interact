@@ -56,7 +56,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
     var xrfkeyParam = "xrfkey="+xrfkey;
     var basePath = "https://" + localConfig.hostname + ":" + localConfig.portNumber + "/qrs";
 
-    var defaults = request.defaults({
+    var requestDefaults = request.defaults({
         rejectUnauthorized: false,
         host: localConfig.hostname,
         cert: fs.readFileSync(localConfig.certificates.client),
@@ -73,7 +73,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
     });
 
 
-    var qrsInteractInstance = new qrsInteractMain(basePath, xrfkeyParam, defaults);
+    var qrsInteractInstance = new qrsInteractMain(basePath, xrfkeyParam, requestDefaults);
 
     return qrsInteractInstance;
 }
