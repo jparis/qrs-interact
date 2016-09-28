@@ -3,14 +3,14 @@ var Promise = require('bluebird');
 var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefaults) {
 
     if (!String.prototype.startsWith) {
-        String.prototype.startsWith = function(searchString, position) {
+        String.prototype.startsWith = function (searchString, position) {
             position = position || 0;
             return this.substr(position, searchString.length) === searchString;
         };
     }
 
     if (!String.prototype.endsWith) {
-        String.prototype.endsWith = function(searchString, position) {
+        String.prototype.endsWith = function (searchString, position) {
             var subjectString = this.toString();
             if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
                 position = subjectString.length;
@@ -21,7 +21,7 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
         };
     }
 
-    var getFullPath = function(path) {
+    var getFullPath = function (path) {
         var newPath = basePath;
         if (!path.startsWith('/')) {
             newPath += '/';
@@ -42,17 +42,17 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
         return newPath;
     }
 
-    this.Get = function(path) {
-        return new Promise(function(resolve, reject) {
+    this.Get = function (path) {
+        return new Promise(function (resolve, reject) {
             path = getFullPath(path);
             var sCode;
             var r = requestDefaults;
             var res = '';
             r.get(path)
-                .on('response', function(response, body) {
+                .on('response', function (response, body) {
                     sCode = response.statusCode;
                 })
-                .on('data', function(chunk) {
+                .on('data', function (chunk) {
 
                     if (sCode == 200) {
                         res += chunk;
@@ -60,18 +60,18 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                         reject("Received error code: " + sCode);
                     }
                 })
-                .on('error', function(error) {
+                .on('error', function (error) {
 
                 })
-                .on('end', function() {
+                .on('end', function () {
                     resolve(JSON.parse(res));
                 });
 
         });
     };
 
-    this.Post = function(path, body, sendType) {
-        return new Promise(function(resolve, reject) {
+    this.Post = function (path, body, sendType) {
+        return new Promise(function (resolve, reject) {
             path = getFullPath(path);
             var sCode;
             var r = requestDefaults;
@@ -82,27 +82,27 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                     method: 'POST',
                     body: finalBody
                 })
-                .on('response', function(response, body) {
+                .on('response', function (response, body) {
                     sCode = response.statusCode;
                 })
-                .on('error', function(err) {
+                .on('error', function (err) {
 
                 })
-                .on('data', function(data) {
+                .on('data', function (data) {
                     if (sCode == 200 || sCode == 201) {
                         res += data;
                     } else {
                         reject("Received error code: " + sCode + '::' + data);
                     }
                 })
-                .on('end', function() {
+                .on('end', function () {
                     resolve(JSON.parse(res));
                 });
         });
     };
 
-    this.Put = function(path, body) {
-        return new Promise(function(resolve, reject) {
+    this.Put = function (path, body) {
+        return new Promise(function (resolve, reject) {
             path = getFullPath(path);
             var sCode;
             var r = requestDefaults;
@@ -111,7 +111,7 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                     method: 'PUT',
                     body: body
                 })
-                .on('response', function(response, body) {
+                .on('response', function (response, body) {
                     sCode = response.statusCode;
                     if (sCode == 204) {
                         resolve(sCode);
@@ -119,14 +119,14 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                         reject(sCode)
                     }
                 })
-                .on('error', function(err) {
+                .on('error', function (err) {
 
                 });
         })
     };
 
-    this.Delete = function(path) {
-        return new Promise(function(resolve, reject) {
+    this.Delete = function (path) {
+        return new Promise(function (resolve, reject) {
             path = getFullPath(path);
             var sCode;
             var r = requestDefaults;
@@ -135,7 +135,7 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                     url: path,
                     method: 'DELETE'
                 })
-                .on('response', function(response) {
+                .on('response', function (response) {
                     sCode = response.statusCode;
 
                     if (sCode == 204) {
@@ -144,14 +144,13 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                         reject("Received error code: " + sCode);
                     }
                 })
-                .on('error', function(error) {
+                .on('error', function (error) {
 
                 });
         });
     };
 
-    this.GetBasePath = function()
-    {
+    this.GetBasePath = function () {
         return basePath;
     }
 };

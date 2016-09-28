@@ -5,7 +5,7 @@ var request = require('request');
 
 // test setup
 
-var generateXrfKey = function() {
+var generateXrfKey = function () {
     var xrfString = "";
     for (i = 0; i < 16; i++) {
         if (Math.floor(Math.random() * 2) == 0) {
@@ -44,13 +44,15 @@ var scope = nock('http://test.factory')
     .get('/about' + '?' + xrfkeyParam)
     .reply(200, test1Return);
 
-qrsInteractInstance.Get('about').then(function(result) {
+qrsInteractInstance.Get('about').then(function (result) {
     if (JSON.stringify(result) != JSON.stringify(test1Return)) {
         throw "testcase 1 failed - Get returned wrong result.";
     } else {
-        console.log("testcase 1 passed. - Get");
+        console.log("testcase 1 passed - Get");
     }
 });
+
+
 
 // test case 2
 
@@ -76,10 +78,46 @@ qrsInteractInstance.Post('tag', JSON.stringify({
     id: "2454e69a-d2fe-4d1a-bc64-52c5b4232e87",
     name: "tagTest",
     privileges: null
-}), 'json').then(function(result) {
+}), 'json').then(function (result) {
     if (JSON.stringify(result) != JSON.stringify(test2Return)) {
         throw "testcase 2 failed - Post returned wrong result.";
     } else {
-        console.log("testcase 2 passed. - Post");
+        console.log("testcase 2 passed - Post");
+    }
+});
+
+
+
+// test case 3
+
+var test3Return = [{
+    id: "1234e69a-d2fe-4d1a-bc64-52c5b4232e87",
+    createdDate: "2016-09-28T16:20:39.982Z",
+    modifiedDate: "2016-09-28T16:20:39.982Z",
+    modifiedByUserName: "INTERNAL\\sa_repository",
+    name: "tag1",
+    privileges: null,
+    schemaPath: "Tag"
+}, {
+    id: "4321e69a-d2fe-4d1a-bc64-52c5b4232e87",
+    createdDate: "2016-09-28T16:20:39.982Z",
+    modifiedDate: "2016-09-28T16:20:39.982Z",
+    modifiedByUserName: "INTERNAL\\sa_repository",
+    name: "tag2",
+    privileges: null,
+    schemaPath: "Tag"
+}];
+
+var scope = nock('http://test.factory')
+    .get('/tag' + '?' + xrfkeyParam)
+    .reply(200, test3Return);
+
+qrsInteractInstance.Get('tag').then(function (result) {
+    return result[0].name;
+}).then(function (name) {
+    if (name != "tag1") {
+        throw "testcase 3 failed - Get returned wrong result.";
+    } else {
+        console.log("testcase 3 passed - Get array");
     }
 });
