@@ -113,10 +113,10 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                 })
                 .on('response', function(response, body) {
                     sCode = response.statusCode;
-                    if (sCode == 204) {
+                    if (sCode == 200 || sCode == 204) {
                         resolve(sCode);
                     } else {
-                        reject(sCode)
+                        reject(sCode);
                     }
                 })
                 .on('error', function(err) {
