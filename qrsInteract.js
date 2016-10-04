@@ -64,7 +64,7 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
 
                 })
                 .on('end', function () {
-                    resolve(JSON.parse(res));
+                    resolve({"statusCode":sCode,"body":JSON.parse(res)});
                 });
 
         });
@@ -74,8 +74,8 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
         return new Promise(function (resolve, reject) {
             path = getFullPath(path);
             var sCode;
-            var r = requestDefaults;
             var res = '';
+            var r = requestDefaults;
             var finalBody = body != undefined ? (sendType.toLowerCase() == 'json' ? body : JSON.stringify(body)) : undefined;
             r({
                     url: path,
@@ -96,7 +96,7 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                     }
                 })
                 .on('end', function () {
-                    resolve(JSON.parse(res));
+                    resolve({"statusCode":sCode,"body":JSON.parse(res)});
                 });
         });
     };
@@ -105,6 +105,7 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
         return new Promise(function (resolve, reject) {
             path = getFullPath(path);
             var sCode;
+            var res = '';
             var r = requestDefaults;
             r({
                     url: path,
@@ -113,14 +114,20 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                 })
                 .on('response', function (response, body) {
                     sCode = response.statusCode;
+                })
+                .on('data', function (data) {
                     if (sCode == 200 || sCode == 204) {
-                        resolve(sCode);
+                        res += data;
                     } else {
-                        reject(sCode);
+                        reject("Received error code: " + sCode + '::' + data);
                     }
                 })
-                .on('error', function (err) {
 
+            .on('error', function (err) {
+
+                })
+                .on('end', function () {
+                    resolve({"statusCode":sCode,"body":JSON.parse(res)});
                 });
         })
     };

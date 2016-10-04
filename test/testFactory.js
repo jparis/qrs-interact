@@ -45,7 +45,7 @@ var scope = nock('http://test.factory')
     .reply(200, test1Return);
 
 qrsInteractInstance.Get('about').then(function (result) {
-    if (JSON.stringify(result) != JSON.stringify(test1Return)) {
+    if (JSON.stringify(result.body) != JSON.stringify(test1Return)) {
         throw "testcase 1 failed - Get returned wrong result.";
     } else {
         console.log("testcase 1 passed - Get");
@@ -79,7 +79,7 @@ qrsInteractInstance.Post('tag', JSON.stringify({
     name: "tagTest",
     privileges: null
 }), 'json').then(function (result) {
-    if (JSON.stringify(result) != JSON.stringify(test2Return)) {
+    if (JSON.stringify(result.body) != JSON.stringify(test2Return)) {
         throw "testcase 2 failed - Post returned wrong result.";
     } else {
         console.log("testcase 2 passed - Post");
@@ -113,7 +113,7 @@ var scope = nock('http://test.factory')
     .reply(200, test3Return);
 
 qrsInteractInstance.Get('tag').then(function (result) {
-    return result[0].name;
+    return result.body[0].name;
 }).then(function (name) {
     if (name != "tag1") {
         throw "testcase 3 failed - Get returned wrong result.";
