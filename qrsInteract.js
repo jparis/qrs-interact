@@ -64,7 +64,10 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
 
                 })
                 .on('end', function () {
-                    resolve({"statusCode":sCode,"body":JSON.parse(res)});
+                    resolve({
+                        "statusCode": sCode,
+                        "body": JSON.parse(res)
+                    });
                 });
 
         });
@@ -86,17 +89,20 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                     sCode = response.statusCode;
                 })
                 .on('error', function (err) {
-
+                    reject(err);
                 })
                 .on('data', function (data) {
-                    if (sCode == 200 || sCode == 201) {
-                        res += data;
-                    } else {
-                        reject("Received error code: " + sCode + '::' + data);
-                    }
+                    res += data;
                 })
                 .on('end', function () {
-                    resolve({"statusCode":sCode,"body":JSON.parse(res)});
+                    if (sCode == 200 || sCode == 201) {
+                        resolve({
+                            "statusCode": sCode,
+                            "body": JSON.parse(res)
+                        });
+                    } else {
+                        reject("Received error code: " + sCode + '::' + res);
+                    }
                 });
         });
     };
@@ -116,18 +122,20 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                     sCode = response.statusCode;
                 })
                 .on('data', function (data) {
-                    if (sCode == 200 || sCode == 204) {
-                        res += data;
-                    } else {
-                        reject("Received error code: " + sCode + '::' + data);
-                    }
+                    res += data;
                 })
-
-            .on('error', function (err) {
-
+                .on('error', function (err) {
+                    reject(err);
                 })
                 .on('end', function () {
-                    resolve({"statusCode":sCode,"body":JSON.parse(res)});
+                    if (sCode == 200 || sCode == 204) {
+                        resolve({
+                            "statusCode": sCode,
+                            "body": JSON.parse(res)
+                        });
+                    } else {
+                        reject("Received error code: " + sCode + '::' + res);
+                    }
                 });
         })
     };
