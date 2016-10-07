@@ -95,9 +95,14 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                 })
                 .on('end', function () {
                     if (sCode == 200 || sCode == 201) {
+                        var jsonResponse = "";
+                        if (res != '')
+                        {
+                            jsonResponse = JSON.parse(res);
+                        }
                         resolve({
                             "statusCode": sCode,
-                            "body": JSON.parse(res)
+                            "body": jsonResponse
                         });
                     } else {
                         reject("Received error code: " + sCode + '::' + res);
@@ -128,9 +133,14 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                 })
                 .on('end', function () {
                     if (sCode == 200 || sCode == 204) {
+                        var jsonResponse = "";
+                        if (res != '')
+                        {
+                            jsonResponse = JSON.parse(res);
+                        }
                         resolve({
                             "statusCode": sCode,
-                            "body": JSON.parse(res)
+                            "body": jsonResponse
                         });
                     } else {
                         reject("Received error code: " + sCode + '::' + res);
