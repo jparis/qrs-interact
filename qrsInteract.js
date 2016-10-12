@@ -45,35 +45,38 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
     this.Get = function (path) {
         return new Promise(function (resolve, reject) {
             path = getFullPath(path);
-            var sCode;
-            var res = '';
+            var statusCode;
+            var bufferResponse = new Buffer(0);
             var r = requestDefaults;
             r.get(path)
                 .on('response', function (response, body) {
-                    sCode = response.statusCode;
+                    statusCode = response.statusCode;
                 })
                 .on('error', function (err) {
                     reject(err);
                 })
                 .on('data', function (data) {
-                    res += data;
+                    bufferResponse = Buffer.concat([bufferResponse, data]);
                 })
                 .on('end', function () {
-                    if (sCode == 200) {
-                        var bodyResponse = "";
-                        if (res != '') {
+                    if (statusCode == 200) {
+                        var jsonResponse = "";
+                        if (bufferResponse.length != 0) {
                             try {
-                                bodyResponse = JSON.parse(res);
+                                jsonResponse = JSON.parse(bufferResponse);
                             } catch (e) {
-                                bodyResponse = res;
+                                resolve({
+                                    "statusCode": statusCode,
+                                    "body": bufferResponse
+                                });
                             }
                         }
                         resolve({
-                            "statusCode": sCode,
-                            "body": bodyResponse
+                            "statusCode": statusCode,
+                            "body": jsonResponse
                         });
                     } else {
-                        reject("Received error code: " + sCode + '::' + res);
+                        reject("Received error code: " + statusCode + '::' + bufferResponse);
                     }
                 });
 
@@ -83,8 +86,8 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
     this.Post = function (path, body, sendType) {
         return new Promise(function (resolve, reject) {
             path = getFullPath(path);
-            var sCode;
-            var res = '';
+            var statusCode;
+            var bufferResponse = new Buffer(0);
             var r = requestDefaults;
             var finalBody = body != undefined ? (sendType.toLowerCase() == 'json' ? body : JSON.stringify(body)) : undefined;
             r({
@@ -93,30 +96,33 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                     body: finalBody
                 })
                 .on('response', function (response, body) {
-                    sCode = response.statusCode;
+                    statusCode = response.statusCode;
                 })
                 .on('error', function (err) {
                     reject(err);
                 })
                 .on('data', function (data) {
-                    res += data;
+                    bufferResponse = Buffer.concat([bufferResponse, data]);
                 })
                 .on('end', function () {
-                    if (sCode == 200 || sCode == 201) {
-                        var bodyResponse = "";
-                        if (res != '') {
+                    if (statusCode == 200 || statusCode == 201) {
+                        var jsonResponse = "";
+                        if (bufferResponse.length != 0) {
                             try {
-                                bodyResponse = JSON.parse(res);
+                                jsonResponse = JSON.parse(bufferResponse);
                             } catch (e) {
-                                bodyResponse = res;
+                                resolve({
+                                    "statusCode": statusCode,
+                                    "body": bufferResponse
+                                });
                             }
                         }
                         resolve({
-                            "statusCode": sCode,
-                            "body": bodyResponse
+                            "statusCode": statusCode,
+                            "body": jsonResponse
                         });
                     } else {
-                        reject("Received error code: " + sCode + '::' + res);
+                        reject("Received error code: " + statusCode + '::' + bufferResponse);
                     }
                 });
         });
@@ -125,8 +131,8 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
     this.Put = function (path, body) {
         return new Promise(function (resolve, reject) {
             path = getFullPath(path);
-            var sCode;
-            var res = '';
+            var statusCode;
+            var bufferResponse = new Buffer(0);
             var r = requestDefaults;
             r({
                     url: path,
@@ -134,30 +140,33 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
                     body: body
                 })
                 .on('response', function (response, body) {
-                    sCode = response.statusCode;
+                    statusCode = response.statusCode;
                 })
                 .on('error', function (err) {
                     reject(err);
                 })
                 .on('data', function (data) {
-                    res += data;
+                    bufferResponse = Buffer.concat([bufferResponse, data]);
                 })
                 .on('end', function () {
-                    if (sCode == 200 || sCode == 204) {
-                        var bodyResponse = "";
-                        if (res != '') {
+                    if (statusCode == 200 || statusCode == 204) {
+                        var jsonResponse = "";
+                        if (bufferResponse.length != 0) {
                             try {
-                                bodyResponse = JSON.parse(res);
+                                jsonResponse = JSON.parse(bufferResponse);
                             } catch (e) {
-                                bodyResponse = res;
+                                resolve({
+                                    "statusCode": statusCode,
+                                    "body": bufferResponse
+                                });
                             }
                         }
                         resolve({
-                            "statusCode": sCode,
-                            "body": bodyResponse
+                            "statusCode": statusCode,
+                            "body": jsonResponse
                         });
                     } else {
-                        reject("Received error code: " + sCode + '::' + res);
+                        reject("Received error code: " + statusCode + '::' + bufferResponse);
                     }
                 });
         })
@@ -166,19 +175,19 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
     this.Delete = function (path) {
         return new Promise(function (resolve, reject) {
             path = getFullPath(path);
-            var sCode;
+            var statusCode;
             var r = requestDefaults;
             r({
                     url: path,
                     method: 'DELETE'
                 })
                 .on('response', function (response) {
-                    sCode = response.statusCode;
+                    statusCode = response.statusCode;
 
-                    if (sCode == 204) {
-                        resolve(sCode);
+                    if (statusCode == 204) {
+                        resolve(statusCode);
                     } else {
-                        reject("Received error code: " + sCode);
+                        reject("Received error code: " + statusCode);
                     }
                 })
                 .on('error', function (err) {
