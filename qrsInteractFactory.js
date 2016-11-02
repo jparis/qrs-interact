@@ -8,32 +8,27 @@ var request = require('request');
 
 var qrsInteract = function QRSInteract(inputConfig) {
 
-    var updateConfig = function(inputConfig)
-    {
+    var updateConfig = function (inputConfig) {
         var newConfig = common.clone(config);
-        if (typeof inputConfig == 'string')
-        {
+        if (typeof inputConfig == 'string') {
             newConfig.hostname = inputConfig;
-        }
-        else
-        {
+        } else {
             newConfig = extend(true, newConfig, inputConfig);
         }
-        
-        newConfig = extend(true, newConfig, {
-            certificates: {
-		        client: path.resolve(newConfig.localCertPath, 'client.pem'),
-		        client_key: path.resolve(newConfig.localCertPath, 'client_key.pem'),
-		        server: path.resolve(newConfig.localCertPath, 'server.pem'),
-		        server_key: path.resolve(newConfig.localCertPath, 'server_key.pem'),
-		        root: path.resolve(newConfig.localCertPath, 'root.pem')
-            }
-        });
+
+        if (newConfig['certificates'] == null) {
+            newConfig = extend(true, newConfig, {
+                certificates: {
+                    certFile: path.resolve(newConfig.localCertPath, 'client.pem'),
+                    keyFile: path.resolve(newConfig.localCertPath, 'client_key.pem')
+                }
+            });
+        }
 
         return newConfig;
     }
 
-    var generateXrfKey = function() {
+    var generateXrfKey = function () {
         var xrfString = "";
         for (i = 0; i < 16; i++) {
             if (Math.floor(Math.random() * 2) == 0) {
@@ -53,28 +48,55 @@ var qrsInteract = function QRSInteract(inputConfig) {
 
     var localConfig = updateConfig(inputConfig);
     var xrfkey = generateXrfKey();
-    var xrfkeyParam = "xrfkey="+xrfkey;
+    var xrfkeyParam = "xrfkey=" + xrfkey;
     var basePath = "https://" + localConfig.hostname + ":" + localConfig.portNumber + "/qrs";
 
-    var requestDefaults = request.defaults({
-        rejectUnauthorized: false,
-        host: localConfig.hostname,
-        cert: fs.readFileSync(localConfig.certificates.client),
-        key: fs.readFileSync(localConfig.certificates.client_key),
-        ca: fs.readFileSync(localConfig.certificates.root),
-        headers: {
+    var defaultHeaders;
+    if (localConfig['headers'] == null) {
+        var defaultHeaders = {
             'X-Qlik-User': localConfig.repoAccount,
-            'X-Qlik-Xrfkey': xrfkey,
             'Content-Type': 'application/json',
             'Accept-Encoding': 'gzip'
-        },
-        gzip: true,
-        json: true
+        };
+    } else {
+        var defaultHeaders = localConfig['headers'];
+    }
+
+    defaultHeaders = extend(true, defaultHeaders, {
+        'X-Qlik-Xrfkey': xrfkey
     });
 
+    var requestDefaults;
+    if (localConfig['certificates']['certFile'] != null && localConfig['certificates']['keyFile'] != null)
+    {
+        requestDefaults = request.defaults({
+            rejectUnauthorized: false,
+            host: localConfig.hostname,
+            cert: fs.readFileSync(localConfig.certificates.certFile),
+            key: fs.readFileSync(localConfig.certificates.keyFile),
+            headers: defaultHeaders,
+            gzip: true,
+            json: true
+        });
+    }
+    else if (localConfig['certificates']['pfxFile'] != null && localConfig['certificates']['passphrase'] != null)
+    {
+        requestDefaults = request.defaults({
+            rejectUnauthorized: false,
+            host: localConfig.hostname,
+            pfx: fs.readFileSync(localConfig.certificates.pfxFile),
+            headers: defaultHeaders,
+            gzip: true,
+            json: true,
+            passphrase: localConfig.certificates.passphrase
+        });
+    }
+    else
+    {
+        throw "Please use 'certFile' and 'keyFile' OR 'pfxFile' and 'passphrase' in your config for setting up your certificates.";
+    }
 
     var qrsInteractInstance = new qrsInteractMain(basePath, xrfkeyParam, requestDefaults);
-
     return qrsInteractInstance;
 }
 
