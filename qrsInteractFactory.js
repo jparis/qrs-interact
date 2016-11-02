@@ -66,9 +66,10 @@ var qrsInteract = function QRSInteract(inputConfig) {
         'X-Qlik-Xrfkey': xrfkey
     });
 
+    var requestDefaults;
     if (localConfig['certificates']['certFile'] != null && localConfig['certificates']['keyFile'] != null)
     {
-        var requestDefaults = request.defaults({
+        requestDefaults = request.defaults({
             rejectUnauthorized: false,
             host: localConfig.hostname,
             cert: fs.readFileSync(localConfig.certificates.certFile),
@@ -80,7 +81,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
     }
     else if (localConfig['certificates']['pfxFile'] != null && localConfig['certificates']['passphrase'] != null)
     {
-        var requestDefaults = request.defaults({
+        requestDefaults = request.defaults({
             rejectUnauthorized: false,
             host: localConfig.hostname,
             pfx: fs.readFileSync(localConfig.certificates.pfxFile),
@@ -95,9 +96,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
         throw "Please use 'certFile' and 'keyFile' OR 'pfxFile' and 'passphrase' in your config for setting up your certificates.";
     }
 
-
     var qrsInteractInstance = new qrsInteractMain(basePath, xrfkeyParam, requestDefaults);
-
     return qrsInteractInstance;
 }
 
