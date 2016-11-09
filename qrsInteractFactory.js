@@ -8,6 +8,25 @@ var request = require('request');
 
 var qrsInteract = function QRSInteract(inputConfig) {
 
+        if (!String.prototype.startsWith) {
+        String.prototype.startsWith = function (searchString, position) {
+            position = position || 0;
+            return this.substr(position, searchString.length) === searchString;
+        };
+    }
+
+    if (!String.prototype.endsWith) {
+        String.prototype.endsWith = function (searchString, position) {
+            var subjectString = this.toString();
+            if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
+                position = subjectString.length;
+            }
+            position -= searchString.length;
+            var lastIndex = subjectString.indexOf(searchString, position);
+            return lastIndex !== -1 && lastIndex === position;
+        };
+    }
+
     var updateConfig = function (inputConfig) {
         var newConfig = common.clone(config);
         if (typeof inputConfig == 'string') {
@@ -23,6 +42,16 @@ var qrsInteract = function QRSInteract(inputConfig) {
                     keyFile: path.resolve(newConfig.localCertPath, 'client_key.pem')
                 }
             });
+        }
+
+        if (newConfig.virtualProxyPrefix != "" && !newConfig.virtualProxyPrefix.startsWith('/'))
+        {
+            newConfig.virtualProxyPrefix = '/' + newConfig.virtualProxyPrefix;
+        }
+
+        if (newConfig.virtualProxyPrefix != "" && newConfig.virtualProxyPrefix.endsWith('/'))
+        {
+            newConfig.virtualProxyPrefix = newConfig.virtualProxyPrefix.substr(0, newConfig.virtualProxyPrefix.length-1);
         }
 
         return newConfig;
@@ -49,7 +78,11 @@ var qrsInteract = function QRSInteract(inputConfig) {
     var localConfig = updateConfig(inputConfig);
     var xrfkey = generateXrfKey();
     var xrfkeyParam = "xrfkey=" + xrfkey;
-    var basePath = "https://" + localConfig.hostname + ":" + localConfig.portNumber + "/qrs";
+    var basePath = "https://" +
+        localConfig.hostname +
+        (localConfig.portNumber == "" ? "" : ":" + localConfig.portNumber) +
+        (localConfig.virtualProxyPrefix == "" ? "" : "/" + localConfig.virtualProxyPrefix) +
+        "/qrs";
 
     var defaultHeaders;
     if (localConfig['headers'] == null) {
@@ -67,8 +100,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
     });
 
     var requestDefaults;
-    if (localConfig['certificates']['certFile'] != null && localConfig['certificates']['keyFile'] != null)
-    {
+    if (localConfig['certificates']['certFile'] != null && localConfig['certificates']['keyFile'] != null) {
         requestDefaults = request.defaults({
             rejectUnauthorized: false,
             host: localConfig.hostname,
@@ -78,9 +110,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
             gzip: true,
             json: true
         });
-    }
-    else if (localConfig['certificates']['pfxFile'] != null && localConfig['certificates']['passphrase'] != null)
-    {
+    } else if (localConfig['certificates']['pfxFile'] != null && localConfig['certificates']['passphrase'] != null) {
         requestDefaults = request.defaults({
             rejectUnauthorized: false,
             host: localConfig.hostname,
@@ -90,9 +120,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
             json: true,
             passphrase: localConfig.certificates.passphrase
         });
-    }
-    else
-    {
+    } else {
         throw "Please use 'certFile' and 'keyFile' OR 'pfxFile' and 'passphrase' in your config for setting up your certificates.";
     }
 
