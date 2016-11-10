@@ -117,7 +117,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
         throw "Please use 'certFile' and 'keyFile' OR 'pfxFile' and 'passphrase' in your config for setting up your certificates.";
     }
 
-    var qrsInteractInstance = new qrsInteractMain(basePath, xrfkeyParam, requestDefaultParams);
+    var qrsInteractInstance = new qrsInteractMain(localConfig.hostname, localConfig.portNumber, localConfig.virtualProxyPrefix, xrfkeyParam, requestDefaultParams);
     return qrsInteractInstance;
 }
 
