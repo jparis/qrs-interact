@@ -6,10 +6,26 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
     common.initStringHelpers();
 
     var generateBasePath = function (host, port, virtualProxy) {
-        return "https://" +
-            host +
-            (port == "" ? "" : virtualProxy != "" ? "" : ":" + port) +
-            (virtualProxy == "" ? "" : "/" + virtualProxy) +
+        var newVirtualProxy = virtualProxy;
+        if (newVirtualProxy != undefined) {
+            if (newVirtualProxy != "" && !newVirtualProxy.startsWith('/')) {
+                newVirtualProxy = '/' + newVirtualProxy;
+            }
+
+            if (newVirtualProxy != "" && newVirtualProxy.endsWith('/')) {
+                newVirtualProxy = newVirtualProxy.substr(0, newVirtualProxy.length - 1);
+            }
+        }
+
+        var newHost = host;
+        if (newHost.endsWith('/'))
+        {
+            newHost = newHost.substr(0, newHost.length - 1);
+        }
+
+        return (newHost.startsWith('http') ? newHost : "https://" + newHost) +
+            (port == "" ? "" : newVirtualProxy != "" ? "" : ":" + port) +
+            (newVirtualProxy == "" ? "" : "/" + newVirtualProxy) +
             "/qrs";
     }
 

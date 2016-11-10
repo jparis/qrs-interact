@@ -26,16 +26,6 @@ var qrsInteract = function QRSInteract(inputConfig) {
             });
         }
 
-        if (newConfig.virtualProxyPrefix != undefined) {
-            if (newConfig.virtualProxyPrefix != "" && !newConfig.virtualProxyPrefix.startsWith('/')) {
-                newConfig.virtualProxyPrefix = '/' + newConfig.virtualProxyPrefix;
-            }
-
-            if (newConfig.virtualProxyPrefix != "" && newConfig.virtualProxyPrefix.endsWith('/')) {
-                newConfig.virtualProxyPrefix = newConfig.virtualProxyPrefix.substr(0, newConfig.virtualProxyPrefix.length - 1);
-            }
-        }
-
         return newConfig;
     }
 

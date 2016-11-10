@@ -26,7 +26,7 @@ var generateXrfKey = function () {
 var xrfkey = generateXrfKey();
 var xrfkeyParam = "xrfkey=" + xrfkey;
 
-var qrsInteractInstance = new qrsInteractMain("http://test.factory", xrfkeyParam, request);
+var qrsInteractInstance = new qrsInteractMain("http://test.factory", "", "", xrfkeyParam, request);
 
 
 
@@ -41,7 +41,7 @@ var test1Return = {
 };
 
 var scope = nock('http://test.factory')
-    .get('/about' + '?' + xrfkeyParam)
+    .get('/qrs/about' + '?' + xrfkeyParam)
     .reply(200, test1Return);
 
 qrsInteractInstance.Get('about').then(function (result) {
@@ -67,7 +67,7 @@ var test2Return = {
 };
 
 var scope = nock('http://test.factory')
-    .post('/tag' + '?' + xrfkeyParam, {
+    .post('/qrs/tag' + '?' + xrfkeyParam, {
         "id": "2454e69a-d2fe-4d1a-bc64-52c5b4232e87",
         "name": "tagTest",
         "privileges": null
@@ -109,7 +109,7 @@ var test3Return = [{
 }];
 
 var scope = nock('http://test.factory')
-    .get('/tag' + '?' + xrfkeyParam)
+    .get('/qrs/tag' + '?' + xrfkeyParam)
     .reply(200, test3Return);
 
 qrsInteractInstance.Get('tag').then(function (result) {
