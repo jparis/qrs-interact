@@ -8,7 +8,7 @@ var qrsInteractMain = require('./qrsInteract');
 
 var qrsInteract = function QRSInteract(inputConfig) {
 
-        if (!String.prototype.startsWith) {
+    if (!String.prototype.startsWith) {
         String.prototype.startsWith = function (searchString, position) {
             position = position || 0;
             return this.substr(position, searchString.length) === searchString;
@@ -44,14 +44,12 @@ var qrsInteract = function QRSInteract(inputConfig) {
             });
         }
 
-        if (newConfig.virtualProxyPrefix != "" && !newConfig.virtualProxyPrefix.startsWith('/'))
-        {
+        if (newConfig.virtualProxyPrefix != "" && !newConfig.virtualProxyPrefix.startsWith('/')) {
             newConfig.virtualProxyPrefix = '/' + newConfig.virtualProxyPrefix;
         }
 
-        if (newConfig.virtualProxyPrefix != "" && newConfig.virtualProxyPrefix.endsWith('/'))
-        {
-            newConfig.virtualProxyPrefix = newConfig.virtualProxyPrefix.substr(0, newConfig.virtualProxyPrefix.length-1);
+        if (newConfig.virtualProxyPrefix != "" && newConfig.virtualProxyPrefix.endsWith('/')) {
+            newConfig.virtualProxyPrefix = newConfig.virtualProxyPrefix.substr(0, newConfig.virtualProxyPrefix.length - 1);
         }
 
         return newConfig;
@@ -78,11 +76,6 @@ var qrsInteract = function QRSInteract(inputConfig) {
     var localConfig = updateConfig(inputConfig);
     var xrfkey = generateXrfKey();
     var xrfkeyParam = "xrfkey=" + xrfkey;
-    var basePath = "https://" +
-        localConfig.hostname +
-        (localConfig.portNumber == "" ? "" : ":" + localConfig.portNumber) +
-        (localConfig.virtualProxyPrefix == "" ? "" : "/" + localConfig.virtualProxyPrefix) +
-        "/qrs";
 
     var defaultHeaders;
     if (localConfig['headers'] == null) {
@@ -99,9 +92,9 @@ var qrsInteract = function QRSInteract(inputConfig) {
         'X-Qlik-Xrfkey': xrfkey
     });
 
-    var requestDefaults;
+    var requestDefaultParams;
     if (localConfig['certificates']['certFile'] != null && localConfig['certificates']['keyFile'] != null) {
-        requestDefaults = {
+        requestDefaultParams = {
             rejectUnauthorized: false,
             host: localConfig.hostname,
             cert: fs.readFileSync(localConfig.certificates.certFile),
@@ -111,7 +104,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
             json: true
         };
     } else if (localConfig['certificates']['pfxFile'] != null && localConfig['certificates']['passphrase'] != null) {
-        requestDefaults = {
+        requestDefaultParams = {
             rejectUnauthorized: false,
             host: localConfig.hostname,
             pfx: fs.readFileSync(localConfig.certificates.pfxFile),
@@ -124,7 +117,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
         throw "Please use 'certFile' and 'keyFile' OR 'pfxFile' and 'passphrase' in your config for setting up your certificates.";
     }
 
-    var qrsInteractInstance = new qrsInteractMain(basePath, xrfkeyParam, requestDefaults);
+    var qrsInteractInstance = new qrsInteractMain(basePath, xrfkeyParam, requestDefaultParams);
     return qrsInteractInstance;
 }
 

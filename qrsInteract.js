@@ -1,25 +1,14 @@
 var Promise = require('bluebird');
 var request = require('request');
 
-var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefaults) {
+var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPrefix, xrfkeyParam, requestDefaultParams) {
 
-    if (!String.prototype.startsWith) {
-        String.prototype.startsWith = function (searchString, position) {
-            position = position || 0;
-            return this.substr(position, searchString.length) === searchString;
-        };
-    }
-
-    if (!String.prototype.endsWith) {
-        String.prototype.endsWith = function (searchString, position) {
-            var subjectString = this.toString();
-            if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
-                position = subjectString.length;
-            }
-            position -= searchString.length;
-            var lastIndex = subjectString.indexOf(searchString, position);
-            return lastIndex !== -1 && lastIndex === position;
-        };
+    var generateBasePath = function (host, port, virtualProxy) {
+        return "https://" +
+            host +
+            (port == "" ? "" : virtualProxy != "" ? "" : ":" + port) +
+            (virtualProxy == "" ? "" : "/" + virtualProxy) +
+            "/qrs";
     }
 
     var getFullPath = function (path) {
@@ -43,15 +32,17 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
         return newPath;
     }
 
-    this.UpdateCookie = function(userCookie)
-    {
-        requestDefaults.headers.Cookie = cookieToString(userCookie);
+    var basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
+    var requestDefaults = request.defaults(requestDefaultParams);
+
+    this.UseCookie = function (userCookie) {
+        requestDefaultParams.headers.Cookie = userCookie;
         delete requestDefaults.headers['X-Qlik-User'];
+        requestDefaults = request.defaults(requestDefaultParams);
     };
 
-    this.UpdateBasePath = function(vProxyPrefix)
-    {
-        basePath = "https://" + requestDefaults.host + (vProxyPrefix.length==0 ? "" : "/" + vProxyPrefix) + "/qrs" ;
+    this.UpdateVirtualProxyPrefix = function (vProxyPrefix) {
+        basePath = generateBasePath(hostname, portNumber, vProxyPrefix);
     }
 
     this.Get = function (path) {
@@ -59,7 +50,7 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
             path = getFullPath(path);
             var statusCode;
             var bufferResponse = new Buffer(0);
-            var r = request.defaults(requestDefaults);
+            var r = requestDefaults;
             r.get(path)
                 .on('response', function (response, body) {
                     statusCode = response.statusCode;
@@ -100,7 +91,7 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
             path = getFullPath(path);
             var statusCode;
             var bufferResponse = new Buffer(0);
-            var r = request.defaults(requestDefaults);
+            var r = requestDefaults;
             var finalBody = body != undefined ? (sendType.toLowerCase() == 'json' ? body : JSON.stringify(body)) : undefined;
             r({
                     url: path,
@@ -145,7 +136,7 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
             path = getFullPath(path);
             var statusCode;
             var bufferResponse = new Buffer(0);
-            var r = request.defaults(requestDefaults);
+            var r = requestDefaults;
             r({
                     url: path,
                     method: 'PUT',
@@ -188,7 +179,7 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
         return new Promise(function (resolve, reject) {
             path = getFullPath(path);
             var statusCode;
-            var r = request.defaults(requestDefaults);
+            var r = requestDefaults;
             r({
                     url: path,
                     method: 'DELETE'
@@ -214,13 +205,3 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
 };
 
 module.exports = qrsInteract;
-
-function cookieToString(objCookie)
-{
-    var result ="";
-    for(var key in objCookie)
-    {
-        result += key + "=" + objCookie[key] + ";"
-    }
-    return result;
-}
