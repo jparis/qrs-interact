@@ -1,24 +1,32 @@
+var common = require('./common');
 var Promise = require('bluebird');
+var request = require('request');
 
-var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefaults) {
+var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPrefix, xrfkeyParam, requestDefaultParams) {
+    common.initStringHelpers();
 
-    if (!String.prototype.startsWith) {
-        String.prototype.startsWith = function (searchString, position) {
-            position = position || 0;
-            return this.substr(position, searchString.length) === searchString;
-        };
-    }
-
-    if (!String.prototype.endsWith) {
-        String.prototype.endsWith = function (searchString, position) {
-            var subjectString = this.toString();
-            if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
-                position = subjectString.length;
+    var generateBasePath = function (host, port, virtualProxy) {
+        var newVirtualProxy = virtualProxy;
+        if (newVirtualProxy != undefined) {
+            if (newVirtualProxy != "" && !newVirtualProxy.startsWith('/')) {
+                newVirtualProxy = '/' + newVirtualProxy;
             }
-            position -= searchString.length;
-            var lastIndex = subjectString.indexOf(searchString, position);
-            return lastIndex !== -1 && lastIndex === position;
-        };
+
+            if (newVirtualProxy != "" && newVirtualProxy.endsWith('/')) {
+                newVirtualProxy = newVirtualProxy.substr(0, newVirtualProxy.length - 1);
+            }
+        }
+
+        var newHost = host;
+        if (newHost.endsWith('/'))
+        {
+            newHost = newHost.substr(0, newHost.length - 1);
+        }
+
+        return (newHost.startsWith('http') ? newHost : "https://" + newHost) +
+            (port == "" ? "" : newVirtualProxy != "" ? "" : ":" + port) +
+            (newVirtualProxy == "" ? "" : "/" + newVirtualProxy) +
+            "/qrs";
     }
 
     var getFullPath = function (path) {
@@ -40,6 +48,19 @@ var qrsInteract = function QRSInteractMain(basePath, xrfkeyParam, requestDefault
         }
 
         return newPath;
+    }
+
+    var basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
+    var requestDefaults = request.defaults(requestDefaultParams);
+
+    this.UseCookie = function (userCookie) {
+        requestDefaultParams.headers.Cookie = userCookie;
+        delete requestDefaults.headers['X-Qlik-User'];
+        requestDefaults = request.defaults(requestDefaultParams);
+    };
+
+    this.UpdateVirtualProxyPrefix = function (vProxyPrefix) {
+        basePath = generateBasePath(hostname, portNumber, vProxyPrefix);
     }
 
     this.Get = function (path) {
