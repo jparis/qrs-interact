@@ -4,7 +4,7 @@ var extend = require('extend');
 var fs = require('fs');
 var path = require('path');
 var qrsInteractMain = require('./qrsInteract');
-var request = require('request');
+
 
 var qrsInteract = function QRSInteract(inputConfig) {
 
@@ -101,7 +101,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
 
     var requestDefaults;
     if (localConfig['certificates']['certFile'] != null && localConfig['certificates']['keyFile'] != null) {
-        requestDefaults = request.defaults({
+        requestDefaults = {
             rejectUnauthorized: false,
             host: localConfig.hostname,
             cert: fs.readFileSync(localConfig.certificates.certFile),
@@ -109,9 +109,9 @@ var qrsInteract = function QRSInteract(inputConfig) {
             headers: defaultHeaders,
             gzip: true,
             json: true
-        });
+        };
     } else if (localConfig['certificates']['pfxFile'] != null && localConfig['certificates']['passphrase'] != null) {
-        requestDefaults = request.defaults({
+        requestDefaults = {
             rejectUnauthorized: false,
             host: localConfig.hostname,
             pfx: fs.readFileSync(localConfig.certificates.pfxFile),
@@ -119,7 +119,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
             gzip: true,
             json: true,
             passphrase: localConfig.certificates.passphrase
-        });
+        };
     } else {
         throw "Please use 'certFile' and 'keyFile' OR 'pfxFile' and 'passphrase' in your config for setting up your certificates.";
     }
