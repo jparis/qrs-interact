@@ -25,7 +25,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
 
         return (newHost.startsWith('http') ? newHost : "https://" + newHost) +
             (port == "" ? "" : newVirtualProxy != "" ? "" : ":" + port) +
-            (newVirtualProxy == "" ? "" : "/" + newVirtualProxy) +
+            (newVirtualProxy == "" ? "" : newVirtualProxy) +
             "/qrs";
     }
 
@@ -55,7 +55,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
 
     this.UseCookie = function (userCookie) {
         requestDefaultParams.headers.Cookie = userCookie;
-        delete requestDefaults.headers['X-Qlik-User'];
+        delete requestDefaultParams.headers['X-Qlik-User'];
         requestDefaults = request.defaults(requestDefaultParams);
     };
 
