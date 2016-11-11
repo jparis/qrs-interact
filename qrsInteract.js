@@ -60,7 +60,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
     };
 
     this.UpdateVirtualProxyPrefix = function (vProxyPrefix) {
-        basePath = generateBasePath(hostname, "", vProxyPrefix);
+        basePath = generateBasePath(hostname, portNumber, vProxyPrefix);
     }
 
     this.Get = function (path) {
