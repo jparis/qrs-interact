@@ -18,8 +18,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
         }
 
         var newHost = host;
-        if (newHost.endsWith('/'))
-        {
+        if (newHost.endsWith('/')) {
             newHost = newHost.substr(0, newHost.length - 1);
         }
 
@@ -110,12 +109,28 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
             var statusCode;
             var bufferResponse = new Buffer(0);
             var r = requestDefaults;
-            var finalBody = body != undefined ? (sendType.toLowerCase() == 'json' ? body : JSON.stringify(body)) : undefined;
-            r({
+            var postRequest;
+            if (sendType.toLowerCase() == 'vnd.qlik.sense.app') {
+                r = r.defaults({
+                    headers: {
+                        'Content-Type': 'application/vnd.qlik.sense.app'
+                    }
+                });
+                postRequest = body.pipe(r({
+                    url: path,
+                    method: 'POST'
+                }));
+
+            } else {
+                var finalBody = body != undefined ? (sendType.toLowerCase() == 'json' ? body : JSON.stringify(body)) : undefined;
+                postRequest = r({
                     url: path,
                     method: 'POST',
                     body: finalBody
-                })
+                });
+            }
+
+            postRequest
                 .on('response', function (response, body) {
                     statusCode = response.statusCode;
                 })
