@@ -110,7 +110,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
             var bufferResponse = new Buffer(0);
             var r = requestDefaults;
             var postRequest;
-            if (sendType.toLowerCase() == 'vnd.qlik.sense.app') {
+            if (sendType != undefined && sendType.toLowerCase() == 'vnd.qlik.sense.app') {
                 r = r.defaults({
                     headers: {
                         'Content-Type': 'application/vnd.qlik.sense.app'
