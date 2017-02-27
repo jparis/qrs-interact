@@ -7,12 +7,16 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
 
     var generateBasePath = function (host, port, virtualProxy) {
         var newVirtualProxy = virtualProxy;
-        if (newVirtualProxy != undefined) {
-            if (newVirtualProxy != "" && !newVirtualProxy.startsWith('/')) {
+        if (newVirtualProxy == undefined)
+        {
+            newVirtualProxy = "";
+        }
+        if (newVirtualProxy != "") {
+            if (!newVirtualProxy.startsWith('/')) {
                 newVirtualProxy = '/' + newVirtualProxy;
             }
 
-            if (newVirtualProxy != "" && newVirtualProxy.endsWith('/')) {
+            if (newVirtualProxy.endsWith('/')) {
                 newVirtualProxy = newVirtualProxy.substr(0, newVirtualProxy.length - 1);
             }
         }
