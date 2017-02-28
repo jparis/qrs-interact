@@ -27,7 +27,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
         }
 
         return (newHost.startsWith('http') ? newHost : "https://" + newHost) +
-            (port == "" ? "" : newVirtualProxy != "" ? "" : ":" + port) +
+            (port == "" ? "" : (newVirtualProxy != "" ? "" : (requestDefaultParams.headers['X-Qlik-User'] == undefined ? "" : ":" + port))) +
             (newVirtualProxy == "" ? "" : newVirtualProxy) +
             "/qrs";
     }
