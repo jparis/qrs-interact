@@ -60,10 +60,12 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
         requestDefaultParams.headers.Cookie = userCookie;
         delete requestDefaultParams.headers['X-Qlik-User'];
         requestDefaults = request.defaults(requestDefaultParams);
+        basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
     };
 
     this.UpdateVirtualProxyPrefix = function (vProxyPrefix) {
-        basePath = generateBasePath(hostname, portNumber, vProxyPrefix);
+        virtualProxyPrefix = vProxyPrefix;
+        basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
     }
 
     this.Get = function (path) {
