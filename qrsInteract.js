@@ -48,7 +48,10 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
         } else {
             var stringToEncode = newPath.substr(indexOfQuery + 1);
             newPath = newPath.substring(0, indexOfQuery + 1);
-            newPath = newPath + encodeURI(stringToEncode);
+            if (stringToEncode == decodeURI(stringToEncode)) {
+                stringToEncode = encodeURI(stringToEncode);
+            }
+            newPath = newPath + stringToEncode;
             newPath += '&' + xrfkeyParam;
         }
 
