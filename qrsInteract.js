@@ -5,7 +5,7 @@ var request = require('request');
 var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPrefix, xrfkeyParam, requestDefaultParams) {
     common.initStringHelpers();
 
-    var generateBasePath = function(host, port, virtualProxy) {
+    var generateBasePath = function (host, port, virtualProxy) {
         var newVirtualProxy = virtualProxy;
         if (newVirtualProxy == undefined) {
             newVirtualProxy = "";
@@ -31,7 +31,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
             "/qrs";
     }
 
-    var getFullPath = function(path) {
+    var getFullPath = function (path) {
         var newPath = basePath;
         if (!path.startsWith('/')) {
             newPath += '/';
@@ -46,6 +46,9 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
         if (indexOfQuery <= indexOfSlash) {
             newPath += '?' + xrfkeyParam;
         } else {
+            var stringToEncode = newPath.substr(indexOfQuery + 1);
+            newPath = newPath.substring(0, indexOfQuery + 1);
+            newPath = newPath + encodeURI(stringToEncode);
             newPath += '&' + xrfkeyParam;
         }
 
@@ -55,40 +58,40 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
     var basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
     var requestDefaults = request.defaults(requestDefaultParams);
 
-    this.UseCookie = function(userCookie) {
+    this.UseCookie = function (userCookie) {
         requestDefaultParams.headers.Cookie = userCookie;
         delete requestDefaultParams.headers['X-Qlik-User'];
         requestDefaults = request.defaults(requestDefaultParams);
         basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
     };
 
-    this.UpdateVirtualProxyPrefix = function(vProxyPrefix) {
+    this.UpdateVirtualProxyPrefix = function (vProxyPrefix) {
         virtualProxyPrefix = vProxyPrefix;
         basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
     }
 
-    this.UpdateHostname = function(newHostname) {
+    this.UpdateHostname = function (newHostname) {
         hostname = newHostname;
         basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
     }
 
-    this.Get = function(path) {
-        return new Promise(function(resolve, reject) {
+    this.Get = function (path) {
+        return new Promise(function (resolve, reject) {
             path = getFullPath(path);
             var statusCode;
             var bufferResponse = new Buffer(0);
             var r = requestDefaults;
             r.get(path)
-                .on('response', function(response, body) {
+                .on('response', function (response, body) {
                     statusCode = response.statusCode;
                 })
-                .on('error', function(err) {
+                .on('error', function (err) {
                     reject(err);
                 })
-                .on('data', function(data) {
+                .on('data', function (data) {
                     bufferResponse = Buffer.concat([bufferResponse, data]);
                 })
-                .on('end', function() {
+                .on('end', function () {
                     if (statusCode == 200) {
                         var jsonResponse = "";
                         if (bufferResponse.length != 0) {
@@ -113,8 +116,8 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
         });
     };
 
-    this.Post = function(path, body, sendType) {
-        return new Promise(function(resolve, reject) {
+    this.Post = function (path, body, sendType) {
+        return new Promise(function (resolve, reject) {
             path = getFullPath(path);
             var statusCode;
             var bufferResponse = new Buffer(0);
@@ -144,16 +147,16 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
             }
 
             postRequest
-                .on('response', function(response, body) {
+                .on('response', function (response, body) {
                     statusCode = response.statusCode;
                 })
-                .on('error', function(err) {
+                .on('error', function (err) {
                     reject(err);
                 })
-                .on('data', function(data) {
+                .on('data', function (data) {
                     bufferResponse = Buffer.concat([bufferResponse, data]);
                 })
-                .on('end', function() {
+                .on('end', function () {
                     if (statusCode == 200 || statusCode == 201) {
                         var jsonResponse = "";
                         if (bufferResponse.length != 0) {
@@ -177,8 +180,8 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
         });
     };
 
-    this.Put = function(path, body) {
-        return new Promise(function(resolve, reject) {
+    this.Put = function (path, body) {
+        return new Promise(function (resolve, reject) {
             path = getFullPath(path);
             var statusCode;
             var bufferResponse = new Buffer(0);
@@ -188,16 +191,16 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                     method: 'PUT',
                     body: body
                 })
-                .on('response', function(response, body) {
+                .on('response', function (response, body) {
                     statusCode = response.statusCode;
                 })
-                .on('error', function(err) {
+                .on('error', function (err) {
                     reject(err);
                 })
-                .on('data', function(data) {
+                .on('data', function (data) {
                     bufferResponse = Buffer.concat([bufferResponse, data]);
                 })
-                .on('end', function() {
+                .on('end', function () {
                     if (statusCode == 200 || statusCode == 204) {
                         var jsonResponse = "";
                         if (bufferResponse.length != 0) {
@@ -221,8 +224,8 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
         })
     };
 
-    this.Delete = function(path) {
-        return new Promise(function(resolve, reject) {
+    this.Delete = function (path) {
+        return new Promise(function (resolve, reject) {
             path = getFullPath(path);
             var statusCode;
             var r = requestDefaults;
@@ -230,7 +233,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                     url: path,
                     method: 'DELETE'
                 })
-                .on('response', function(response) {
+                .on('response', function (response) {
                     statusCode = response.statusCode;
 
                     if (statusCode == 204) {
@@ -239,13 +242,13 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                         reject("Received error code: " + statusCode);
                     }
                 })
-                .on('error', function(err) {
+                .on('error', function (err) {
                     reject(err);
                 });
         });
     };
 
-    this.GetBasePath = function() {
+    this.GetBasePath = function () {
         return basePath;
     }
 };
