@@ -7,8 +7,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
 
     var generateBasePath = function (host, port, virtualProxy) {
         var newVirtualProxy = virtualProxy;
-        if (newVirtualProxy == undefined)
-        {
+        if (newVirtualProxy == undefined) {
             newVirtualProxy = "";
         }
         if (newVirtualProxy != "") {
@@ -47,6 +46,12 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
         if (indexOfQuery <= indexOfSlash) {
             newPath += '?' + xrfkeyParam;
         } else {
+            var stringToEncode = newPath.substr(indexOfQuery + 1);
+            newPath = newPath.substring(0, indexOfQuery + 1);
+            if (stringToEncode == decodeURI(stringToEncode)) {
+                stringToEncode = encodeURI(stringToEncode);
+            }
+            newPath = newPath + stringToEncode;
             newPath += '&' + xrfkeyParam;
         }
 
@@ -65,6 +70,11 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
 
     this.UpdateVirtualProxyPrefix = function (vProxyPrefix) {
         virtualProxyPrefix = vProxyPrefix;
+        basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
+    }
+
+    this.UpdateHostname = function (newHostname) {
+        hostname = newHostname;
         basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
     }
 
@@ -116,8 +126,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
             var bufferResponse = new Buffer(0);
             var r = requestDefaults;
             var postRequest;
-            if (sendType == undefined)
-            {
+            if (sendType == undefined) {
                 sendType = "";
             }
             if (sendType.toLowerCase() == 'vnd.qlik.sense.app') {
