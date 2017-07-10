@@ -1,6 +1,6 @@
 {
     "name": "qrs-interact",
-    "version": "2.5.5",
+    "version": "2.5.6",
     "description": "A small javascript library to interact with the Qlik Sense Repository Service",
     "main": "qrsInteractFactory.js",
     "scripts": {
