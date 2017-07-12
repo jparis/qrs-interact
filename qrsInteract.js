@@ -128,19 +128,16 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
             var postRequest;
             if (sendType == undefined) {
                 sendType = "";
-                postRequest = r({
-                    url: path,
-                    method: 'POST',
-                    body: body
-                });
-            } else if (sendType.toLowerCase() == 'json') {
+            }
+            if (sendType.toLowerCase() == 'json' || sendType.toLowerCase() == 'application/json' || sendType == "") {
                 var finalBody = body != undefined ? (sendType.toLowerCase() == 'json' ? body : JSON.stringify(body)) : undefined;
                 postRequest = r({
                     url: path,
                     method: 'POST',
                     body: finalBody
                 });
-            } else {
+            }
+            else {
                 r = r.defaults({
                     headers: {
                         'Content-Type': sendType
