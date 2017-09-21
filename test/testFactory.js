@@ -60,7 +60,7 @@ var test2Return = {
     id: "2454e69a-d2fe-4d1a-bc64-52c5b4232e87",
     createdDate: "2016-09-28T16:20:39.982Z",
     modifiedDate: "2016-09-28T16:20:39.982Z",
-    modifiedByUserName: "INTERNAL\\sa_repository",
+    modifiedByUserName: "INTERNAL\\sa_api",
     name: "tagTest",
     privileges: null,
     schemaPath: "Tag"
@@ -94,7 +94,7 @@ var test3Return = [{
     id: "1234e69a-d2fe-4d1a-bc64-52c5b4232e87",
     createdDate: "2016-09-28T16:20:39.982Z",
     modifiedDate: "2016-09-28T16:20:39.982Z",
-    modifiedByUserName: "INTERNAL\\sa_repository",
+    modifiedByUserName: "INTERNAL\\sa_api",
     name: "tag1",
     privileges: null,
     schemaPath: "Tag"
@@ -102,7 +102,7 @@ var test3Return = [{
     id: "4321e69a-d2fe-4d1a-bc64-52c5b4232e87",
     createdDate: "2016-09-28T16:20:39.982Z",
     modifiedDate: "2016-09-28T16:20:39.982Z",
-    modifiedByUserName: "INTERNAL\\sa_repository",
+    modifiedByUserName: "INTERNAL\\sa_api",
     name: "tag2",
     privileges: null,
     schemaPath: "Tag"
