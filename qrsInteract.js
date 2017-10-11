@@ -159,7 +159,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                     bufferResponse = Buffer.concat([bufferResponse, data]);
                 })
                 .on('end', function () {
-                    if (statusCode == 200 || statusCode == 201) {
+                    if (statusCode == 200 || statusCode == 201 || statusCode == 204) {
                         var jsonResponse = "";
                         if (bufferResponse.length != 0) {
                             try {
