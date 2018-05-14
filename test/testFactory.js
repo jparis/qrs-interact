@@ -1,3 +1,4 @@
+'use strict';
 var nock = require('nock');
 var qrsInteractMain = require('../qrsInteract');
 var request = require('request');
