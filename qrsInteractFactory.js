@@ -87,6 +87,14 @@ var qrsInteract = function QRSInteract(inputConfig) {
             json: true,
             passphrase: localConfig.certificates.passphrase
         };
+    } else if (defaultHeaders['Authorization'].match(/^Bearer .*$/)) {
+        requestDefaultParams = {
+            rejectUnauthorized: false,
+            host: localConfig.hostname,
+            headers: defaultHeaders,
+            gzip: true,
+            json: true
+        };
     } else {
         throw "Please use 'certFile' and 'keyFile' OR 'pfxFile' and 'passphrase' in your config for setting up your certificates.";
     }
