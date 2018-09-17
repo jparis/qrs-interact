@@ -87,7 +87,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
             json: true,
             passphrase: localConfig.certificates.passphrase
         };
-    } else if (defaultHeaders['Authorization'].match(/^Bearer .*$/)) {
+    } else if (defaultHeaders['Authorization'] && defaultHeaders['Authorization'].match(/^Bearer .*$/)) {
         requestDefaultParams = {
             rejectUnauthorized: false,
             host: localConfig.hostname,
