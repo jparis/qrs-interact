@@ -1,4 +1,5 @@
-[![CircleCI](https://circleci.com/gh/eapowertools/qrs-interact.svg?style=shield&circle-token=749f3baa48b5f018effe7fec24a75648b13cc226)](https://circleci.com/gh/eapowertools/qrs-interact/)  
+# Status
+[![Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)[![CircleCI](https://circleci.com/gh/eapowertools/qrs-interact.svg?style=shield&circle-token=749f3baa48b5f018effe7fec24a75648b13cc226)](https://circleci.com/gh/eapowertools/qrs-interact/)  
 [![NPM](https://nodei.co/npm/qrs-interact.png)](https://nodei.co/npm/qrs-interact/)
 
 ## qrs-interact
