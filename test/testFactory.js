@@ -5,7 +5,7 @@ var request = require('request');
 
 // test setup
 
-var generateXrfKey = function () {
+var generateXrfKey = function() {
     var xrfString = "";
     for (i = 0; i < 16; i++) {
         if (Math.floor(Math.random() * 2) == 0) {
@@ -44,7 +44,7 @@ var scope = nock('http://test.factory')
     .get('/qrs/about' + '?' + xrfkeyParam)
     .reply(200, test1Return);
 
-qrsInteractInstance.Get('about').then(function (result) {
+qrsInteractInstance.Get('about').then(function(result) {
     if (JSON.stringify(result.body) != JSON.stringify(test1Return)) {
         throw "testcase 1 failed - Get returned wrong result.";
     } else {
@@ -78,7 +78,7 @@ qrsInteractInstance.Post('tag', JSON.stringify({
     id: "2454e69a-d2fe-4d1a-bc64-52c5b4232e87",
     name: "tagTest",
     privileges: null
-}), 'json').then(function (result) {
+}), 'json').then(function(result) {
     if (JSON.stringify(result.body) != JSON.stringify(test2Return)) {
         throw "testcase 2 failed - Post returned wrong result.";
     } else {
@@ -112,12 +112,30 @@ var scope = nock('http://test.factory')
     .get('/qrs/tag' + '?' + xrfkeyParam)
     .reply(200, test3Return);
 
-qrsInteractInstance.Get('tag').then(function (result) {
+qrsInteractInstance.Get('tag').then(function(result) {
     return result.body[0].name;
-}).then(function (name) {
+}).then(function(name) {
     if (name != "tag1") {
         throw "testcase 3 failed - Get returned wrong result.";
     } else {
         console.log("testcase 3 passed - Get array");
+    }
+});
+
+
+
+// test case 4
+
+var test4Return = "someStringBuffer";
+
+var scope = nock('http://test.factory')
+    .get('/tempcontent' + '?' + xrfkeyParam)
+    .reply(200, test1Return);
+
+qrsInteractInstance.Get('tempcontent').then(function(result) {
+    if (result.body != test4Return) {
+        throw "testcase 4 failed - Get returned wrong result.";
+    } else {
+        console.log("testcase 4 passed - Get");
     }
 });
