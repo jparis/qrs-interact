@@ -129,21 +129,21 @@ allTestPromises.push(qrsInteractInstance.Get('tag').then(function(result) {
 var test4Return = "someStringBuffer";
 
 var scope1 = nock('http://test.factory')
-    .get('/tempcontent' + '?' + xrfkeyParam)
-    .reply(200, test1Return);
+    .get('/tempcontent/someContent' + '?' + xrfkeyParam)
+    .reply(200, test4Return);
 
 var scope2 = nock('http://test.factory')
-    .get('/qrs/tempcontent' + '?' + xrfkeyParam)
+    .get('/qrs/tempcontent/someContent' + '?' + xrfkeyParam)
     .reply(404, "Not Found");
 
-allTestPromises.push(qrsInteractInstance.Get('tempcontent').then(function(result) {
+allTestPromises.push(qrsInteractInstance.Get('tempcontent/someContent').then(function(result) {
     if (result.body != test4Return) {
         throw "testcase 4 failed - Get returned wrong result.";
     } else {
         console.log("testcase 4 passed - Get");
     }
 }).catch(function(err) {
-    throw "testcase 4 failed - Wrong endpoint hit.";
+    throw "testcase 4 failed:" + err;
 }));
 
 promise.all(allTestPromises).catch(function(allErrors) {

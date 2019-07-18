@@ -81,7 +81,8 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
     this.Get = function(path) {
         return new Promise(function(resolve, reject) {
             path = getFullPath(path);
-            path.replace("/qrs/tempcontent/", "/tempcontent/");
+            path = path.replace("/qrs/tempcontent/", "/tempcontent/");
+            console.log(path);
             var statusCode;
             var bufferResponse = new Buffer(0);
             var r = requestDefaults;
