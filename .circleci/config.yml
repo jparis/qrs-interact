@@ -7,9 +7,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install-nvm
-          command: nvm install stable && nvm alias default stable
-      - run:
           name: update-npm
           command: 'sudo npm install -g npm'
       - restore_cache:
