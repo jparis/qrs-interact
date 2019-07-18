@@ -1,6 +1,7 @@
 var nock = require('nock');
 var qrsInteractMain = require('../qrsInteract');
 var request = require('request');
+var promise = require('bluebird');
 
 // test setup
 
@@ -27,7 +28,7 @@ var xrfkeyParam = "xrfkey=" + xrfkey;
 
 var qrsInteractInstance = new qrsInteractMain("http://test.factory", "", "", xrfkeyParam, request);
 
-
+var allTestPromises = [];
 
 // test case 1
 
@@ -43,13 +44,13 @@ var scope = nock('http://test.factory')
     .get('/qrs/about' + '?' + xrfkeyParam)
     .reply(200, test1Return);
 
-qrsInteractInstance.Get('about').then(function(result) {
+allTestPromises.push(qrsInteractInstance.Get('about').then(function(result) {
     if (JSON.stringify(result.body) != JSON.stringify(test1Return)) {
         throw "testcase 1 failed - Get returned wrong result.";
     } else {
         console.log("testcase 1 passed - Get");
     }
-});
+}));
 
 
 
@@ -73,7 +74,7 @@ var scope = nock('http://test.factory')
     })
     .reply(201, test2Return);
 
-qrsInteractInstance.Post('tag', JSON.stringify({
+allTestPromises.push(qrsInteractInstance.Post('tag', JSON.stringify({
     id: "2454e69a-d2fe-4d1a-bc64-52c5b4232e87",
     name: "tagTest",
     privileges: null
@@ -83,7 +84,7 @@ qrsInteractInstance.Post('tag', JSON.stringify({
     } else {
         console.log("testcase 2 passed - Post");
     }
-});
+}));
 
 
 
@@ -111,7 +112,7 @@ var scope = nock('http://test.factory')
     .get('/qrs/tag' + '?' + xrfkeyParam)
     .reply(200, test3Return);
 
-qrsInteractInstance.Get('tag').then(function(result) {
+allTestPromises.push(qrsInteractInstance.Get('tag').then(function(result) {
     return result.body[0].name;
 }).then(function(name) {
     if (name != "tag1") {
@@ -119,7 +120,7 @@ qrsInteractInstance.Get('tag').then(function(result) {
     } else {
         console.log("testcase 3 passed - Get array");
     }
-});
+}));
 
 
 
@@ -135,12 +136,17 @@ var scope2 = nock('http://test.factory')
     .get('/qrs/tempcontent' + '?' + xrfkeyParam)
     .reply(404, "Not Found");
 
-qrsInteractInstance.Get('tempcontent').then(function(result) {
+allTestPromises.push(qrsInteractInstance.Get('tempcontent').then(function(result) {
     if (result.body != test4Return) {
         throw "testcase 4 failed - Get returned wrong result.";
     } else {
         console.log("testcase 4 passed - Get");
     }
 }).catch(function(err) {
-    throw "testcase 4 failed - Get returned wrong result.";
+    throw "testcase 4 failed - Wrong endpoint hit.";
+}));
+
+promise.all(allTestPromises).catch(function(allErrors) {
+    console.log(allErrors);
+    process.exit(1);
 });
