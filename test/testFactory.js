@@ -140,6 +140,6 @@ try {
             console.log("testcase 4 passed - Get");
         }
     });
-} catch {
+} catch (error) {
     throw "FAILED";
 }
