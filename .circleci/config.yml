@@ -11,7 +11,7 @@ jobs:
           command: nvm install stable && nvm alias default stable
       - run:
           name: update-npm
-          command: 'sudo npm install -g npm@6'
+          command: 'sudo npm install -g npm'
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
