@@ -132,10 +132,14 @@ var scope = nock('http://test.factory')
     .get('/tempcontent' + '?' + xrfkeyParam)
     .reply(200, test1Return);
 
-qrsInteractInstance.Get('tempcontent').then(function(result) {
-    if (result.body != test4Return) {
-        throw "testcase 4 failed - Get returned wrong result.";
-    } else {
-        console.log("testcase 4 passed - Get");
-    }
-});
+try {
+    qrsInteractInstance.Get('tempcontent').then(function(result) {
+        if (result.body != test4Return) {
+            throw "testcase 4 failed - Get returned wrong result.";
+        } else {
+            console.log("testcase 4 passed - Get");
+        }
+    });
+} catch {
+    throw "FAILED";
+}
