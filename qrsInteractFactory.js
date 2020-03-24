@@ -9,7 +9,7 @@ var qrsInteractMain = require('./qrsInteract');
 var qrsInteract = function QRSInteract(inputConfig) {
     common.initStringHelpers();
 
-    var updateConfig = function (inputConfig) {
+    var updateConfig = function(inputConfig) {
         var newConfig = common.clone(config);
         if (typeof inputConfig == 'string') {
             newConfig.hostname = inputConfig;
@@ -29,7 +29,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
         return newConfig;
     }
 
-    var generateXrfKey = function () {
+    var generateXrfKey = function() {
         var xrfString = "";
         for (i = 0; i < 16; i++) {
             if (Math.floor(Math.random() * 2) == 0) {
@@ -56,7 +56,6 @@ var qrsInteract = function QRSInteract(inputConfig) {
         var defaultHeaders = {
             'X-Qlik-User': localConfig.repoAccount,
             'Content-Type': 'application/json',
-            'Accept-Encoding': 'gzip'
         };
     } else {
         var defaultHeaders = localConfig['headers'];
@@ -69,8 +68,11 @@ var qrsInteract = function QRSInteract(inputConfig) {
     var requestDefaultParams;
     if (localConfig['certificates']['certFile'] != null && localConfig['certificates']['keyFile'] != null) {
         requestDefaultParams = {
+            method: '',
+            path: '',
             rejectUnauthorized: false,
             host: localConfig.hostname,
+            port: localConfig.portNumber,
             cert: fs.readFileSync(localConfig.certificates.certFile),
             key: fs.readFileSync(localConfig.certificates.keyFile),
             headers: defaultHeaders,
@@ -79,8 +81,11 @@ var qrsInteract = function QRSInteract(inputConfig) {
         };
     } else if (localConfig['certificates']['pfxFile'] != null && localConfig['certificates']['passphrase'] != null) {
         requestDefaultParams = {
+            method: '',
+            path: '',
             rejectUnauthorized: false,
             host: localConfig.hostname,
+            port: localConfig.portNumber,
             pfx: fs.readFileSync(localConfig.certificates.pfxFile),
             headers: defaultHeaders,
             gzip: true,
@@ -89,8 +94,11 @@ var qrsInteract = function QRSInteract(inputConfig) {
         };
     } else if (defaultHeaders['Authorization'] && defaultHeaders['Authorization'].match(/^Bearer .*$/)) {
         requestDefaultParams = {
+            method: '',
+            path: '',
             rejectUnauthorized: false,
             host: localConfig.hostname,
+            port: localConfig.portNumber,
             headers: defaultHeaders,
             gzip: true,
             json: true

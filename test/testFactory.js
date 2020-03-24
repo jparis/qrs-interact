@@ -1,7 +1,6 @@
 var nock = require('nock');
-var qrsInteractMain = require('../qrsInteract');
-var request = require('request');
 var promise = require('bluebird');
+var qrsInteractMain = require('../qrsInteract');
 
 // test setup
 

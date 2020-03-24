@@ -1,11 +1,11 @@
 var common = require('./common');
+var https = require('https');
 var Promise = require('bluebird');
-var request = require('request');
 
 var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPrefix, xrfkeyParam, requestDefaultParams) {
     common.initStringHelpers();
 
-    var generateBasePath = function(host, port, virtualProxy) {
+    var generateBasePath = function(virtualProxy) {
         var newVirtualProxy = virtualProxy;
         if (newVirtualProxy == undefined) {
             newVirtualProxy = "";
@@ -20,15 +20,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
             }
         }
 
-        var newHost = host;
-        if (newHost.endsWith('/')) {
-            newHost = newHost.substr(0, newHost.length - 1);
-        }
-
-        return (newHost.startsWith('http') ? newHost : "https://" + newHost) +
-            (port == "" ? "" : (newVirtualProxy != "" ? "" : (requestDefaultParams.headers['X-Qlik-User'] == undefined ? "" : ":" + port))) +
-            (newVirtualProxy == "" ? "" : newVirtualProxy) +
-            "/qrs";
+        return (newVirtualProxy == "" ? "" : newVirtualProxy) + "/qrs";
     }
 
     var getFullPath = function(path) {
@@ -58,53 +50,52 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
         return newPath;
     }
 
-    var basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
-    var requestDefaults = request.defaults(requestDefaultParams);
+    var basePath = generateBasePath(virtualProxyPrefix);
 
     this.UseCookie = function(userCookie) {
         requestDefaultParams.headers.Cookie = userCookie;
         delete requestDefaultParams.headers['X-Qlik-User'];
-        requestDefaults = request.defaults(requestDefaultParams);
-        basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
     };
 
     this.UpdateVirtualProxyPrefix = function(vProxyPrefix) {
         virtualProxyPrefix = vProxyPrefix;
-        basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
+        basePath = generateBasePath(virtualProxyPrefix);
     }
 
     this.UpdateHostname = function(newHostname) {
         hostname = newHostname;
-        basePath = generateBasePath(hostname, portNumber, virtualProxyPrefix);
+        basePath = generateBasePath(virtualProxyPrefix);
     }
 
     this.Get = function(path) {
         return new Promise(function(resolve, reject) {
+            var r = requestDefaultParams;
             path = getFullPath(path);
-            path = path.replace("/qrs/tempcontent/", "/tempcontent/");
-            var statusCode;
-            var bufferResponse = new Buffer(0);
-            var r = requestDefaults;
-            r.get(path)
-                .on('response', function(response, body) {
-                    statusCode = response.statusCode;
-                })
-                .on('error', function(err) {
+            if (path.startsWith('/qrs/temptcontent/')) {
+                path = path.substr(4);
+                r.headers['Accept-Encoding'] = 'gzip';
+            }
+            r['method'] = 'GET';
+            r['path'] = path;
+            var req = https.request(r, (res) => {
+                var responseString = "";
+                var statusCode = res.statusCode;
+                res.on('error', function(err) {
                     reject(err);
-                })
-                .on('data', function(data) {
-                    bufferResponse = Buffer.concat([bufferResponse, data]);
-                })
-                .on('end', function() {
+                });
+                res.on('data', function(data) {
+                    responseString += data;
+                });
+                res.on('end', function() {
                     if (statusCode == 200) {
                         var jsonResponse = "";
-                        if (bufferResponse.length != 0) {
+                        if (responseString.length != 0) {
                             try {
-                                jsonResponse = JSON.parse(bufferResponse);
+                                jsonResponse = JSON.parse(responseString);
                             } catch (e) {
                                 resolve({
                                     "statusCode": statusCode,
-                                    "body": bufferResponse
+                                    "body": responseString
                                 });
                             }
                         }
@@ -113,62 +104,54 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                             "body": jsonResponse
                         });
                     } else {
-                        reject("Received error code: " + statusCode + '::' + bufferResponse);
+                        reject("Received error code: " + statusCode + '::' + responseString);
                     }
                 });
-
+            });
+            req.end();
         });
     };
 
     this.Post = function(path, body, sendType) {
         return new Promise(function(resolve, reject) {
+            var r = requestDefaultParams;
+            var finalBody;
             path = getFullPath(path);
-            var statusCode;
-            var bufferResponse = new Buffer(0);
-            var r = requestDefaults;
-            var postRequest;
+            r['method'] = 'POST';
+            r['path'] = path;
             if (sendType == undefined) {
                 sendType = "";
             }
-            if (sendType.toLowerCase() == 'json' || sendType.toLowerCase() == 'application/json' || sendType == "") {
-                var finalBody = body != undefined ? (sendType.toLowerCase() == 'json' ? body : JSON.stringify(body)) : undefined;
-                postRequest = r({
-                    url: path,
-                    method: 'POST',
-                    body: finalBody
-                });
+            if (body == undefined || body == "") {
+                finalBody = "";
+            } else if (sendType.toLowerCase() == 'json' || sendType.toLowerCase() == 'application/json') {
+                finalBody = JSON.stringify(body);
+            } else if (sendType == "") {
+                finalBody = body;
             } else {
-                r = r.defaults({
-                    headers: {
-                        'Content-Type': sendType
-                    }
-                });
-                postRequest = body.pipe(r({
-                    url: path,
-                    method: 'POST'
-                }));
+                r.headers['Content-Type'] = sendType;
+                finalBody = body;
             }
 
-            postRequest
-                .on('response', function(response, body) {
-                    statusCode = response.statusCode;
-                })
-                .on('error', function(err) {
+            var req = https.request(r, (res) => {
+                var responseString = "";
+                var statusCode = res.statusCode;
+                res.on('error', function(err) {
                     reject(err);
-                })
-                .on('data', function(data) {
-                    bufferResponse = Buffer.concat([bufferResponse, data]);
-                })
-                .on('end', function() {
+                });
+                res.on('data', function(data) {
+                    responseString += data;
+                });
+                res.on('end', function() {
                     if (statusCode == 200 || statusCode == 201 || statusCode == 204) {
                         var jsonResponse = "";
-                        if (bufferResponse.length != 0) {
+                        if (responseString.length != 0) {
                             try {
-                                jsonResponse = JSON.parse(bufferResponse);
+                                jsonResponse = JSON.parse(responseString);
                             } catch (e) {
                                 resolve({
                                     "statusCode": statusCode,
-                                    "body": bufferResponse
+                                    "body": responseString
                                 });
                             }
                         }
@@ -177,42 +160,43 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                             "body": jsonResponse
                         });
                     } else {
-                        reject("Received error code: " + statusCode + '::' + bufferResponse);
+                        reject("Received error code: " + statusCode + '::' + responseString);
                     }
                 });
+            });
+            req.write(finalBody);
+            req.end();
         });
     };
 
     this.Put = function(path, body) {
         return new Promise(function(resolve, reject) {
+            var r = requestDefaultParams;
+            var finalBody = JSON.stringify(body);
             path = getFullPath(path);
-            var statusCode;
-            var bufferResponse = new Buffer(0);
-            var r = requestDefaults;
-            r({
-                    url: path,
-                    method: 'PUT',
-                    body: body
-                })
-                .on('response', function(response, body) {
-                    statusCode = response.statusCode;
-                })
-                .on('error', function(err) {
+            r['method'] = 'PUT';
+            r['path'] = path;
+
+            var req = https.request(r, (res) => {
+                var responseString = "";
+                var statusCode = res.statusCode;
+
+                res.on('error', function(err) {
                     reject(err);
-                })
-                .on('data', function(data) {
-                    bufferResponse = Buffer.concat([bufferResponse, data]);
-                })
-                .on('end', function() {
+                });
+                res.on('data', function(data) {
+                    responseString += data;
+                });
+                res.on('end', function() {
                     if (statusCode == 200 || statusCode == 204) {
                         var jsonResponse = "";
-                        if (bufferResponse.length != 0) {
+                        if (responseString.length != 0) {
                             try {
-                                jsonResponse = JSON.parse(bufferResponse);
+                                jsonResponse = JSON.parse(responseString);
                             } catch (e) {
                                 resolve({
                                     "statusCode": statusCode,
-                                    "body": bufferResponse
+                                    "body": responseString
                                 });
                             }
                         }
@@ -224,35 +208,37 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                         reject("Received error code: " + statusCode + '::' + bufferResponse);
                     }
                 });
+            });
+            req.write(finalBody);
+            req.end();
         })
     };
 
     this.Delete = function(path) {
         return new Promise(function(resolve, reject) {
+            var r = requestDefaultParams;
             path = getFullPath(path);
-            var statusCode;
-            var r = requestDefaults;
-            r({
-                    url: path,
-                    method: 'DELETE'
-                })
-                .on('response', function(response) {
-                    statusCode = response.statusCode;
+            r['method'] = 'DELETE';
+            r['path'] = path;
 
-                    if (statusCode == 204) {
-                        resolve(statusCode);
-                    } else {
-                        reject("Received error code: " + statusCode);
-                    }
-                })
-                .on('error', function(err) {
-                    reject(err);
-                });
+            var req = https.request(r, (res) => {
+                var statusCode = res.statusCode;
+                res.on('end', function() {
+                        if (statusCode == 204) {
+                            resolve(statusCode);
+                        } else {
+                            reject("Received error code: " + statusCode);
+                        }
+                    })
+                    .on('error', function(err) {
+                        reject(err);
+                    });
+            });
         });
     };
 
     this.GetBasePath = function() {
-        return basePath;
+        return "https://" + hostname + ":" + portNumber + '/' + basePath;
     }
 };
 

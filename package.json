@@ -17,11 +17,10 @@
     },
     "homepage": "https://github.com/eapowertools/qrs-interact#readme",
     "dependencies": {
-        "bluebird": "^3.5.5",
+        "bluebird": "^3.7.2",
         "extend": "^3.0.2",
         "fs": "0.0.1-security",
         "nock": "^10.0.6",
-        "path": "^0.12.7",
-        "request": "^2.88.0"
+        "path": "^0.12.7"
     }
 }
