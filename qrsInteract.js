@@ -83,7 +83,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                 var responseString = "";
                 var bufferResponse;
                 if (isApp) {
-                    bufferResponse = new Buffer(0);
+                    bufferResponse = Buffer.alloc(0);
                 }
                 var statusCode = res.statusCode;
                 res.on('error', function(err) {

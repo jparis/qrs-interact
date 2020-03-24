@@ -25,7 +25,24 @@ var generateXrfKey = function() {
 var xrfkey = generateXrfKey();
 var xrfkeyParam = "xrfkey=" + xrfkey;
 
-var qrsInteractInstance = new qrsInteractMain("http://test.factory", "", "", xrfkeyParam, request);
+var defaultHeaders = {
+    'X-Qlik-Xrfkey': xrfkey,
+    'X-Qlik-User': 'UserDirectory=Internal;UserId=sa_api',
+    'Content-Type': 'application/json'
+};
+
+requestDefaultParams = {
+    method: '',
+    path: '',
+    rejectUnauthorized: false,
+    host: 'test.factory',
+    port: '443',
+    headers: defaultHeaders,
+    gzip: true,
+    json: true
+};
+
+var qrsInteractInstance = new qrsInteractMain(requestDefaultParams.host, requestDefaultParams.port, "", xrfkeyParam, requestDefaultParams);
 
 var allTestPromises = [];
 
@@ -39,7 +56,7 @@ var test1Return = {
     schemaPath: 'About'
 };
 
-var scope = nock('http://test.factory')
+var scope = nock('https://test.factory')
     .get('/qrs/about' + '?' + xrfkeyParam)
     .reply(200, test1Return);
 
@@ -65,7 +82,7 @@ var test2Return = {
     schemaPath: "Tag"
 };
 
-var scope = nock('http://test.factory')
+var scope = nock('https://test.factory')
     .post('/qrs/tag' + '?' + xrfkeyParam, {
         "id": "2454e69a-d2fe-4d1a-bc64-52c5b4232e87",
         "name": "tagTest",
@@ -73,11 +90,11 @@ var scope = nock('http://test.factory')
     })
     .reply(201, test2Return);
 
-allTestPromises.push(qrsInteractInstance.Post('tag', JSON.stringify({
+allTestPromises.push(qrsInteractInstance.Post('tag', {
     id: "2454e69a-d2fe-4d1a-bc64-52c5b4232e87",
     name: "tagTest",
     privileges: null
-}), 'json').then(function(result) {
+}, 'json').then(function(result) {
     if (JSON.stringify(result.body) != JSON.stringify(test2Return)) {
         throw "testcase 2 failed - Post returned wrong result.";
     } else {
@@ -107,7 +124,7 @@ var test3Return = [{
     schemaPath: "Tag"
 }];
 
-var scope = nock('http://test.factory')
+var scope = nock('https://test.factory')
     .get('/qrs/tag' + '?' + xrfkeyParam)
     .reply(200, test3Return);
 
@@ -127,11 +144,11 @@ allTestPromises.push(qrsInteractInstance.Get('tag').then(function(result) {
 
 var test4Return = "someStringBuffer";
 
-var scope1 = nock('http://test.factory')
+var scope1 = nock('https://test.factory')
     .get('/tempcontent/someContent' + '?' + xrfkeyParam)
     .reply(200, test4Return);
 
-var scope2 = nock('http://test.factory')
+var scope2 = nock('https://test.factory')
     .get('/qrs/tempcontent/someContent' + '?' + xrfkeyParam)
     .reply(404, "Not Found");
 
