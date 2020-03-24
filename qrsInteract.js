@@ -70,39 +70,48 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
     this.Get = function(path) {
         return new Promise(function(resolve, reject) {
             var r = requestDefaultParams;
+            var isApp = false;
             path = getFullPath(path);
-            if (path.startsWith('/qrs/temptcontent/')) {
+            if (path.startsWith('/qrs/tempcontent/')) {
                 path = path.substr(4);
                 r.headers['Accept-Encoding'] = 'gzip';
+                isApp = true;
             }
             r['method'] = 'GET';
             r['path'] = path;
             var req = https.request(r, (res) => {
                 var responseString = "";
+                var bufferResponse;
+                if (isApp) {
+                    bufferResponse = new Buffer(0);
+                }
                 var statusCode = res.statusCode;
                 res.on('error', function(err) {
                     reject(err);
                 });
                 res.on('data', function(data) {
-                    responseString += data;
+                    if (!isApp) {
+                        responseString += data;
+                    } else {
+                        bufferResponse = Buffer.concat([bufferResponse, data]);
+
+                    }
                 });
                 res.on('end', function() {
                     if (statusCode == 200) {
                         var jsonResponse = "";
-                        if (responseString.length != 0) {
-                            try {
-                                jsonResponse = JSON.parse(responseString);
-                            } catch (e) {
-                                resolve({
-                                    "statusCode": statusCode,
-                                    "body": responseString
-                                });
-                            }
+                        if (!isApp) {
+                            jsonResponse = JSON.parse(responseString);
+                            resolve({
+                                "statusCode": statusCode,
+                                "body": jsonResponse
+                            });
+                        } else {
+                            resolve({
+                                "statusCode": statusCode,
+                                "body": bufferResponse
+                            });
                         }
-                        resolve({
-                            "statusCode": statusCode,
-                            "body": jsonResponse
-                        });
                     } else {
                         reject("Received error code: " + statusCode + '::' + responseString);
                     }
