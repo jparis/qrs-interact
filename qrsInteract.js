@@ -87,7 +87,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                 }
                 var statusCode = res.statusCode;
                 res.on('error', function(err) {
-                    reject(err);
+                    reject("QRS response error:" + err);
                 });
                 res.on('data', function(data) {
                     if (!isApp) {
@@ -116,10 +116,10 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                         reject("Received error code: " + statusCode + '::' + responseString);
                     }
                 });
-            }).on('error', (e) => {
-                reject('Error calling QRS: ' + JSON.stringify(e, null, 2));
+            }).on('error', function(err) {
+                reject("QRS request error:" + err);
             });
-        
+
             req.end();
         });
     };
@@ -149,7 +149,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                 var responseString = "";
                 var statusCode = res.statusCode;
                 res.on('error', function(err) {
-                    reject(err);
+                    reject("QRS response error:" + err);
                 });
                 res.on('data', function(data) {
                     responseString += data;
@@ -175,6 +175,8 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                         reject("Received error code: " + statusCode + '::' + responseString);
                     }
                 });
+            }).on('error', function(err) {
+                reject("QRS request error:" + err);
             });
             req.write(finalBody);
             req.end();
@@ -194,7 +196,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                 var statusCode = res.statusCode;
 
                 res.on('error', function(err) {
-                    reject(err);
+                    reject("QRS response error:" + err);
                 });
                 res.on('data', function(data) {
                     responseString += data;
@@ -220,10 +222,12 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                         reject("Received error code: " + statusCode + '::' + bufferResponse);
                     }
                 });
+            }).on('error', function(err) {
+                reject("QRS request error:" + err);
             });
             req.write(finalBody);
             req.end();
-        })
+        });
     };
 
     this.Delete = function(path) {
@@ -243,8 +247,10 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                         }
                     })
                     .on('error', function(err) {
-                        reject(err);
+                        reject("QRS response error:" + err);
                     });
+            }).on('error', function(err) {
+                reject("QRS request error:" + err);
             });
         });
     };
