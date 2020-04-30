@@ -116,7 +116,10 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                         reject("Received error code: " + statusCode + '::' + responseString);
                     }
                 });
+            }).on('error', (e) => {
+                reject('Error calling QRS: ' + JSON.stringify(e, null, 2));
             });
+        
             req.end();
         });
     };
