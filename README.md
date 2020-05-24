@@ -1,6 +1,7 @@
 # Status
-[![Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)[![CircleCI](https://circleci.com/gh/eapowertools/qrs-interact.svg?style=shield&circle-token=749f3baa48b5f018effe7fec24a75648b13cc226)](https://circleci.com/gh/eapowertools/qrs-interact/)  
-[![NPM](https://nodei.co/npm/qrs-interact.png)](https://nodei.co/npm/qrs-interact/)
+[![Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)
+[![CircleCI](https://circleci.com/gh/jparis/qrs-interact.svg?style=shield)](https://circleci.com/gh/jparis/qrs-interact/)  
+[![NPM](https://nodei.co/npm/qrs-interact.svg)](https://nodei.co/npm/qrs-interact/)
 
 ## qrs-interact
 QRS Interact is a simple javascript library that allows users to send queries to the Qlik Sense Repository Service.
@@ -10,18 +11,20 @@ QRS Interact is a simple javascript library that allows users to send queries to
 For more information and advanced usage, please reference the [wiki](https://github.com/eapowertools/qrs-interact/wiki).
 
 #### Installing
-```npm install qrs-interact```
+```bash
+npm install qrs-interact
+```
 
 
 #### Usage
 To use the qrs-interact module, first you must create a new instance.
-```
-var <variableName> = new qrsInteract(<someHostname>);
+```js
+var instance = new qrsInteract('<someHostname>');
 ```
 
 Once you have initialized an instance, GET, POST, PUT, and DELETE all return promises. They can be used as follows.
-```
-<instanceName>.Get(<somePath>)
+```js
+instance.Get('<somePath>')
     .then(function(result)
     {
         // do some work
@@ -33,7 +36,7 @@ Once you have initialized an instance, GET, POST, PUT, and DELETE all return pro
 ```
 
 ##### Example
-```
+```js
 var qrsInteract = require('qrs-interact');
 
 var instance1 = new qrsInteract("abc.qlik.com");
