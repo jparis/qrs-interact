@@ -65,6 +65,7 @@ allTestPromises.push(qrsInteractInstance.Get('about').then(function(result) {
         throw "testcase 1 failed - Get returned wrong result.";
     } else {
         console.log("testcase 1 passed - Get");
+        return "Passed";
     }
 }));
 
@@ -99,6 +100,7 @@ allTestPromises.push(qrsInteractInstance.Post('tag', {
         throw "testcase 2 failed - Post returned wrong result.";
     } else {
         console.log("testcase 2 passed - Post");
+        return "Passed";
     }
 }));
 
@@ -135,6 +137,7 @@ allTestPromises.push(qrsInteractInstance.Get('tag').then(function(result) {
         throw "testcase 3 failed - Get returned wrong result.";
     } else {
         console.log("testcase 3 passed - Get array");
+        return "Passed";
     }
 }));
 
@@ -157,12 +160,36 @@ allTestPromises.push(qrsInteractInstance.Get('tempcontent/someContent').then(fun
         throw "testcase 4 failed - Get returned wrong result.";
     } else {
         console.log("testcase 4 passed - Get");
+        return "Passed";
     }
 }).catch(function(err) {
     throw "testcase 4 failed:" + err;
 }));
 
-promise.all(allTestPromises).catch(function(allErrors) {
+
+
+// test case 5
+
+var scope = nock('https://test.factory')
+    .delete('/qrs/user/2414e19a-d2fe-5d1a-fc64-52c5b4232e87' + '?' + xrfkeyParam)
+    .reply(204, "");
+
+allTestPromises.push(qrsInteractInstance.Delete('user/2414e19a-d2fe-5d1a-fc64-52c5b4232e87').then(function(result) {
+    if (result.statusCode != 204) {
+        throw "testcase 5 failed - Delete returned wrong status code.";
+    } else {
+        console.log("testcase 5 passed - Delete");
+        return "Passed";
+    }
+}).catch(function(err) {
+    throw "testcase 5 failed:" + err;
+}));
+
+
+
+// Cleanup
+
+promise.allSettled(allTestPromises).catch(function(allErrors) {
     console.log(allErrors);
     process.exit(1);
 });
