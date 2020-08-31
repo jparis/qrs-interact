@@ -238,20 +238,39 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
             r['path'] = path;
 
             var req = https.request(r, (res) => {
+                var responseString = "";
                 var statusCode = res.statusCode;
+                res.on('error', function(err) {
+                    reject("QRS response error:" + err);
+                });
+                res.on('data', function(data) {
+                    responseString += data;;
+                });
                 res.on('end', function() {
-                        if (statusCode == 204) {
-                            resolve(statusCode);
-                        } else {
-                            reject("Received error code: " + statusCode);
+                    if (statusCode == 204) {
+                        var jsonResponse = "";
+                        if (responseString.length != 0) {
+                            try {
+                                jsonResponse = JSON.parse(responseString);
+                            } catch (e) {
+                                resolve({
+                                    "statusCode": statusCode,
+                                    "body": responseString
+                                });
+                            }
                         }
-                    })
-                    .on('error', function(err) {
-                        reject("QRS response error:" + err);
-                    });
+                        resolve({
+                            "statusCode": statusCode,
+                            "body": jsonResponse
+                        });
+                    } else {
+                        reject("Received error code: " + statusCode + '::' + bufferResponse);
+                    }
+                });
             }).on('error', function(err) {
                 reject("QRS request error:" + err);
             });
+            req.end();
         });
     };
 
