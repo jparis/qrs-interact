@@ -107,6 +107,11 @@ var qrsInteract = function QRSInteract(inputConfig) {
         throw "Please use 'certFile' and 'keyFile' OR 'pfxFile' and 'passphrase' in your config for setting up your certificates.";
     }
 
+    if (localConfig['minTlsVersion'] != null) requestDefaultParams.minVersion = localConfig.minTlsVersion;
+    if (localConfig['maxTlsVersion'] != null) requestDefaultParams.maxVersion = localConfig.maxTlsVersion;
+    if (localConfig['honorCipherOrder'] != null) requestDefaultParams.honorCipherOrder = localConfig.honorCipherOrder;
+    if (localConfig['ciphers'] != null) requestDefaultParams.ciphers = localConfig.ciphers;
+
     var qrsInteractInstance = new qrsInteractMain(localConfig.hostname, localConfig.portNumber, localConfig.virtualProxyPrefix, xrfkeyParam, requestDefaultParams);
     return qrsInteractInstance;
 }
