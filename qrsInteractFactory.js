@@ -9,7 +9,7 @@ var qrsInteractMain = require('./qrsInteract');
 var qrsInteract = function QRSInteract(inputConfig) {
     common.initStringHelpers();
 
-    var updateConfig = function(inputConfig) {
+    var updateConfig = function (inputConfig) {
         var newConfig = common.clone(config);
         if (typeof inputConfig == 'string') {
             newConfig.hostname = inputConfig;
@@ -29,7 +29,7 @@ var qrsInteract = function QRSInteract(inputConfig) {
         return newConfig;
     }
 
-    var generateXrfKey = function() {
+    var generateXrfKey = function () {
         var xrfString = "";
         for (i = 0; i < 16; i++) {
             if (Math.floor(Math.random() * 2) == 0) {
@@ -107,10 +107,18 @@ var qrsInteract = function QRSInteract(inputConfig) {
         throw "Please use 'certFile' and 'keyFile' OR 'pfxFile' and 'passphrase' in your config for setting up your certificates.";
     }
 
-    if (localConfig['minTlsVersion'] != null) requestDefaultParams.minVersion = localConfig.minTlsVersion;
-    if (localConfig['maxTlsVersion'] != null) requestDefaultParams.maxVersion = localConfig.maxTlsVersion;
-    if (localConfig['honorCipherOrder'] != null) requestDefaultParams.honorCipherOrder = localConfig.honorCipherOrder;
-    if (localConfig['ciphers'] != null) requestDefaultParams.ciphers = localConfig.ciphers;
+    if (localConfig['minTlsVersion'] != null) {
+        requestDefaultParams.minVersion = localConfig.minTlsVersion;
+    }
+    if (localConfig['maxTlsVersion'] != null) {
+        requestDefaultParams.maxVersion = localConfig.maxTlsVersion;
+    }
+    if (localConfig['honorCipherOrder'] != null) {
+        requestDefaultParams.honorCipherOrder = localConfig.honorCipherOrder;
+    }
+    if (localConfig['ciphers'] != null) {
+        requestDefaultParams.ciphers = localConfig.ciphers;
+    }
 
     var qrsInteractInstance = new qrsInteractMain(localConfig.hostname, localConfig.portNumber, localConfig.virtualProxyPrefix, xrfkeyParam, requestDefaultParams);
     return qrsInteractInstance;
