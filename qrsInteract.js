@@ -2,7 +2,7 @@ var common = require('./common');
 var https = require('https');
 var Promise = require('bluebird');
 
-var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPrefix, xrfkeyParam, requestDefaultParams) {
+var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPrefix, xrfkeyParam, requestParams) {
     common.initStringHelpers();
 
     var generateBasePath = function(virtualProxy) {
@@ -53,8 +53,8 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
     var basePath = generateBasePath(virtualProxyPrefix);
 
     this.UseCookie = function(userCookie) {
-        requestDefaultParams.headers.Cookie = userCookie;
-        delete requestDefaultParams.headers['X-Qlik-User'];
+        requestParams.headers.Cookie = userCookie;
+        delete requestParams.headers['X-Qlik-User'];
     };
 
     this.UpdateVirtualProxyPrefix = function(vProxyPrefix) {
@@ -69,17 +69,16 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
 
     this.Get = function(path) {
         return new Promise(function(resolve, reject) {
-            var r = requestDefaultParams;
             var isApp = false;
             path = getFullPath(path);
             if (path.startsWith('/qrs/tempcontent/')) {
                 path = path.substr(4);
-                r.headers['Accept-Encoding'] = 'gzip';
+                requestParams.headers['Accept-Encoding'] = 'gzip';
                 isApp = true;
             }
-            r['method'] = 'GET';
-            r['path'] = path;
-            var req = https.request(r, (res) => {
+            requestParams['method'] = 'GET';
+            requestParams['path'] = path;
+            var req = https.request(requestParams, (res) => {
                 var responseString = "";
                 var bufferResponse;
                 if (isApp) {
@@ -99,6 +98,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                 });
                 res.on('end', function() {
                     if (statusCode == 200) {
+                        delete requestParams.headers['Accept-Encoding'];
                         var jsonResponse = "";
                         if (!isApp) {
                             jsonResponse = JSON.parse(responseString);
@@ -117,6 +117,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                     }
                 });
             }).on('error', function(err) {
+                delete requestParams.headers['Accept-Encoding'];
                 reject(new Error("QRS request error:" + err));
             });
 
@@ -126,11 +127,10 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
 
     this.Post = function(path, body, sendType) {
         return new Promise(function(resolve, reject) {
-            var r = requestDefaultParams;
             var finalBody;
             path = getFullPath(path);
-            r['method'] = 'POST';
-            r['path'] = path;
+            requestParams['method'] = 'POST';
+            requestParams['path'] = path;
             if (sendType == undefined) {
                 sendType = "";
             }
@@ -145,7 +145,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
                 finalBody = body;
             }
 
-            var req = https.request(r, (res) => {
+            var req = https.request(requestParams, (res) => {
                 var responseString = "";
                 var statusCode = res.statusCode;
                 res.on('error', function(err) {
@@ -185,13 +185,12 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
 
     this.Put = function(path, body) {
         return new Promise(function(resolve, reject) {
-            var r = requestDefaultParams;
             var finalBody = JSON.stringify(body);
             path = getFullPath(path);
-            r['method'] = 'PUT';
-            r['path'] = path;
+            requestParams['method'] = 'PUT';
+            requestParams['path'] = path;
 
-            var req = https.request(r, (res) => {
+            var req = https.request(requestParams, (res) => {
                 var responseString = "";
                 var statusCode = res.statusCode;
 
@@ -232,12 +231,11 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
 
     this.Delete = function(path) {
         return new Promise(function(resolve, reject) {
-            var r = requestDefaultParams;
             path = getFullPath(path);
-            r['method'] = 'DELETE';
-            r['path'] = path;
+            requestParams['method'] = 'DELETE';
+            requestParams['path'] = path;
 
-            var req = https.request(r, (res) => {
+            var req = https.request(requestParams, (res) => {
                 var responseString = "";
                 var statusCode = res.statusCode;
                 res.on('error', function(err) {
