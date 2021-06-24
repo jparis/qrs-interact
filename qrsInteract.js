@@ -141,7 +141,7 @@ var qrsInteract = function QRSInteractMain(hostname, portNumber, virtualProxyPre
             } else if (sendType == "") {
                 finalBody = body;
             } else {
-                r.headers['Content-Type'] = sendType;
+                requestParams.headers['Content-Type'] = sendType;
                 finalBody = body;
             }
 
